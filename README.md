@@ -12,6 +12,7 @@ the planned AWS EKS deployment.
 
 Developer
   -> GitHub repository (main)
+  -> GitHub push webhook
   -> Jenkins pipeline
   -> Automated pytest tests
   -> Docker image build
@@ -45,7 +46,11 @@ Terraform VPC/EKS -> Kubernetes Deployment and Service
 - Terraform
 - Kubernetes YAML manifests
 
-Ansible, EKS deployment, Prometheus/Grafana, and notifications remain
+GitHub push webhook delivery and automatic execution of the safe
+Webhook-Test job have been verified. The production job's webhook trigger
+must be verified separately before claiming automatic production deployment.
+
+Ansible, live EKS deployment, Prometheus/Grafana, and notifications remain
 pending validation in the current environment.
 
 ## 5. Repository Structure
@@ -172,7 +177,18 @@ Do not apply or destroy infrastructure without reviewing the plan.
 
 ## 13. Validation Evidence
 
-Latest verified Jenkins pipeline build: `27`
+Latest verified production deployment build: `27`
+
+Webhook validation:
+- GitHub `push` delivery returned HTTP `200`.
+- `Webhook-Test` started automatically with `Started by GitHub push`.
+- Repository checkout succeeded at commit `7192332285ccdef34859ce2fad7704c128b3c369`.
+- Safe webhook verification completed successfully without Docker build,
+  ECR push, or production deployment.
+
+Application tests:
+- `tests/test_app.py`: 3 passed (`test_home`, `test_health`, `test_users`).
+- Test command: `.venv/bin/python -m pytest -v tests/test_app.py`.
 
 Evidence from that pipeline run:
 - Git branch: `main`
@@ -196,7 +212,7 @@ Latest documentation/manifests commit in GitHub: `61a71ba`
 - Integrate Ansible into configuration management.
 - Configure Prometheus/Grafana and alert notifications.
 - Validate automated rollback in a controlled test.
-- Add CI/CD trigger on GitHub changes.
+- Verify and document the GitHub push trigger for the production `Testing` job.
 - Capture final architecture, pipeline, and monitoring evidence.
 
 ## 15. Cost Management
