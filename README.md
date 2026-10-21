@@ -57,10 +57,9 @@ pending validation in the current environment.
 - `k8s/deployment.yaml` - Kubernetes Namespace and Deployment
 - `k8s/service.yaml` - Kubernetes Service
 - `k8s/ingress.yaml` - AWS ALB Ingress configuration
-- `provider.tf`, `versions.tf`, `variables.tf` - Terraform setup
-- `network.tf` - VPC and networking resources
-- `eks.tf` - EKS cluster and node group resources
-- `outputs.tf` - Terraform outputs
+Terraform configuration is currently maintained outside this Git
+repository on the Jenkins controller. See Section 11 for its location.
+The Terraform files are not included in the tracked GitHub repository.
 
 ## 6. Local Development
 
@@ -146,17 +145,19 @@ cluster in the present environment.
 
 ## 11. Terraform
 
-Terraform files define the project VPC, subnets, EKS cluster,
-managed node group, and outputs.
-
-Working directory on the Jenkins controller:
+Terraform configuration is stored locally on the Jenkins controller,
+outside this GitHub repository:
 
     /var/lib/jenkins/terraform-eks-capstone
 
-Review and validate the Terraform plan before applying any changes.
-Creating EKS, NAT Gateway, load balancers, and EC2 resources can incur
-AWS charges.
+The directory contains configuration files for the VPC, networking,
+EKS cluster, managed node group, and outputs. It also contains local
+Terraform working data and saved plan files; do not commit those files
+without reviewing their contents for sensitive information.
 
+The EKS cluster is currently absent. Do not apply the configuration
+without reviewing the plan and confirming the expected AWS costs.
+NAT Gateways, load balancers, EC2 instances, and EKS can incur charges.
 Do not apply or destroy infrastructure without reviewing the plan.
 
 ## 12. Security Notes
@@ -171,14 +172,22 @@ Do not apply or destroy infrastructure without reviewing the plan.
 
 ## 13. Validation Evidence
 
-Latest verified Jenkins build: `27`
+Latest verified Jenkins pipeline build: `27`
 
+Evidence from that pipeline run:
 - Git branch: `main`
 - Git commit: `2ccfeb71d9f77724cddadee0886ebb57a2ab5ba7`
 - ECR image: `devops-flask-api:27`
 - Pipeline result: `SUCCESS`
 - Production `/health`: `{"status":"healthy"}`
 - Previous production image `:26` was preserved as a rollback container.
+
+Latest documentation/manifests commit in GitHub: `61a71ba`
+- Added `k8s/deployment.yaml`, `k8s/service.yaml`, and `k8s/ingress.yaml`.
+- All three files passed local YAML syntax validation.
+- Live Kubernetes API/schema validation and EKS deployment have not
+  been verified because the EKS cluster is currently absent.
+- Automated rollback testing remains pending.
 
 ## 14. Remaining Work
 
