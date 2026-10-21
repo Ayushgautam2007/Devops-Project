@@ -47,8 +47,9 @@ Terraform VPC/EKS -> Kubernetes Deployment and Service
 - Kubernetes YAML manifests
 
 GitHub push webhook delivery and automatic execution of the safe
-Webhook-Test job have been verified. The production job's webhook trigger
-must be verified separately before claiming automatic production deployment.
+Webhook-Test job have been verified. The production `Testing` job's webhook
+trigger is configured, but automatic production execution has not yet been
+verified end to end.
 
 Ansible, live EKS deployment, Prometheus/Grafana, and notifications remain
 pending validation in the current environment.
@@ -198,7 +199,7 @@ Evidence from that pipeline run:
 - Production `/health`: `{"status":"healthy"}`
 - Previous production image `:26` was preserved as a rollback container.
 
-Latest documentation/manifests commit in GitHub: `61a71ba`
+Latest previously verified documentation/manifests commit in GitHub: `7192332`
 - Added `k8s/deployment.yaml`, `k8s/service.yaml`, and `k8s/ingress.yaml`.
 - All three files passed local YAML syntax validation.
 - Live Kubernetes API/schema validation and EKS deployment have not
