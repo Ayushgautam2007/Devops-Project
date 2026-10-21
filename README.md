@@ -51,8 +51,10 @@ Webhook-Test job have been verified. The production `Testing` job's webhook
 trigger is configured, but automatic production execution has not yet been
 verified end to end.
 
-Ansible, live EKS deployment, Prometheus/Grafana, and notifications remain
-pending validation in the current environment.
+Ansible playbooks and the dedicated Jenkins Ansible-Health-Check job have
+been validated against the Docker application server. Live EKS deployment,
+Prometheus/Grafana, and notifications remain pending validation in the
+current environment.
 
 ## 5. Repository Structure
 
@@ -199,6 +201,19 @@ Evidence from that pipeline run:
 - Production `/health`: `{"status":"healthy"}`
 - Previous production image `:26` was preserved as a rollback container.
 
+Ansible validation:
+- Tracked playbooks: `system_info.yml`, `docker_health.yml`, and `disk_check.yml`.
+- Inventory: `ansible/inventory/hosts.ini`; configuration: `ansible/ansible.cfg`.
+- All three playbooks passed syntax checks.
+- Jenkins job `Ansible-Health-Check` completed with `SUCCESS`.
+- Remote Docker service was `active`; Flask `/health` returned
+  `{"status":"healthy"}`.
+- Health-check recap: `ok=6`, `changed=0`, `unreachable=0`, `failed=0`.
+- Disk check passed with root filesystem usage below the 80% threshold.
+- Ansible commit: `9d210a0` (`feat(ansible): add server health and disk validation playbooks`).
+- These checks validate remote health and basic disk/system checks; they do
+  not yet constitute automatic Ansible execution in the production pipeline.
+
 Latest previously verified documentation/manifests commit in GitHub: `7192332`
 - Added `k8s/deployment.yaml`, `k8s/service.yaml`, and `k8s/ingress.yaml`.
 - All three files passed local YAML syntax validation.
@@ -210,7 +225,7 @@ Latest previously verified documentation/manifests commit in GitHub: `7192332`
 
 - Recreate and validate EKS when budget permits.
 - Deploy Kubernetes manifests and verify the ALB endpoint.
-- Integrate Ansible into configuration management.
+- Integrate Ansible playbooks into the production pipeline (pending; currently run via a dedicated manual Jenkins job).
 - Configure Prometheus/Grafana and alert notifications.
 - Validate automated rollback in a controlled test.
 - Verify and document the GitHub push trigger for the production `Testing` job.
