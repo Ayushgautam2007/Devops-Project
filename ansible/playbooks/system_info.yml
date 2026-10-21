@@ -1,0 +1,14 @@
+---
+- name: Collect application server information
+  hosts: docker_servers
+  gather_facts: true
+
+  tasks:
+    - name: Display server summary
+      ansible.builtin.debug:
+        msg:
+          - "Hostname: {{ ansible_hostname }}"
+          - "OS: {{ ansible_distribution }} {{ ansible_distribution_version }}"
+          - "Architecture: {{ ansible_architecture }}"
+          - "Default IPv4: {{ ansible_default_ipv4.address | default('N/A') }}"
+          - "Memory total MB: {{ (ansible_memtotal_mb | default(0)) | int }}"

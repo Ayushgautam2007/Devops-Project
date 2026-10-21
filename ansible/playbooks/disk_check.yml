@@ -1,0 +1,28 @@
+---
+- name: Check application server disk usage
+  hosts: docker_servers
+  gather_facts: false
+
+  tasks:
+    - name: Read root filesystem usage
+      ansible.builtin.command: df -P /
+      register: disk_usage
+      changed_when: false
+
+    - name: Extract root filesystem usage percentage
+      ansible.builtin.set_fact:
+        root_disk_usage_pct: "{{ disk_usage.stdout_lines[1].split()[4] | regex_replace('%', '') | int }}"
+
+    - name: Display root filesystem usage
+      ansible.builtin.debug:
+        msg: "Root filesystem usage: {{ root_disk_usage_pct }}% (alert threshold: 80%)"
+
+    - name: Fail if root filesystem usage reaches 80 percent
+      ansible.builtin.fail:
+        msg: "CRITICAL: Root filesystem usage is {{ root_disk_usage_pct }}%, which meets or exceeds the 80% threshold."
+      when: (root_disk_usage_pct | int) >= 80
+
+    - name: Confirm disk usage is below threshold
+      ansible.builtin.debug:
+        msg: "PASS: Root filesystem usage is below 80%."
+      when: (root_disk_usage_pct | int) < 80

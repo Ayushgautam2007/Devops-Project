@@ -1,0 +1,35 @@
+---
+- name: Check Docker application server health
+  hosts: docker_servers
+  gather_facts: false
+
+  tasks:
+    - name: Check Docker service state
+      ansible.builtin.command: systemctl is-active docker
+      register: docker_service
+      changed_when: false
+
+    - name: Display Docker service state
+      ansible.builtin.debug:
+        msg: "Docker service: {{ docker_service.stdout }}"
+
+    - name: Check running containers
+      ansible.builtin.command: docker ps --format '{{ "{{" }}.Names{{ "}}" }} {{ "{{" }}.Image{{ "}}" }} {{ "{{" }}.Status{{ "}}" }}'
+      register: running_containers
+      changed_when: false
+
+    - name: Display running containers
+      ansible.builtin.debug:
+        var: running_containers.stdout_lines
+
+    - name: Check Flask application health endpoint
+      ansible.builtin.uri:
+        url: http://127.0.0.1:9090/health
+        method: GET
+        status_code: 200
+        return_content: true
+      register: app_health
+
+    - name: Display application health
+      ansible.builtin.debug:
+        msg: "Application health response: {{ app_health.content }}"
