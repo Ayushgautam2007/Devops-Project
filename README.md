@@ -206,3 +206,6 @@ Review NAT Gateways, load balancers, EKS node groups, EC2 instances,
 EBS volumes, Elastic IPs, and CloudWatch log groups before cleanup.
 
 Preserve required Terraform state and project artifacts.
+
+
+Done
