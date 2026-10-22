@@ -7,12 +7,6 @@ pipeline {
     }
 
     stages {
-        stage('Checkout Source') {
-            steps {
-                checkout scm
-            }
-        }
-
         stage('Terraform Format Check') {
             steps {
                 dir('terraform') {
