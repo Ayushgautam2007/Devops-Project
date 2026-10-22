@@ -21,3 +21,23 @@ Decision:
 - Do not modify the installed Checkov policy.
 - Do not suppress the finding in the scan.
 - Reassess if the cluster version or AWS encryption behavior changes.
+
+## CKV_AWS_39 — EKS public API endpoint
+
+Status: Reviewed — restricted public access retained for the lab.
+
+The cluster configuration enables private and public API endpoint access.
+Public access is restricted to the Jenkins controller's IPv4 address
+using the `/32` CIDR `13.232.197.246/32`. The private endpoint remains
+enabled as well.
+
+Checkov recommends disabling the public endpoint entirely. For this lab,
+the restricted public endpoint supports Jenkins access without requiring
+additional VPC connectivity to the private endpoint.
+
+Decision:
+- Keep the public endpoint CIDR restricted; never use `0.0.0.0/0`.
+- Verify the Jenkins controller's public IP before recreating the cluster.
+- For production, prefer private-only access where Jenkins has suitable
+  private network connectivity to the EKS API.
+- Reassess this decision if the Jenkins network or deployment architecture changes.
