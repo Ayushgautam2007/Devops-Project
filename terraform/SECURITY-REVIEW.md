@@ -41,3 +41,24 @@ Decision:
 - For production, prefer private-only access where Jenkins has suitable
   private network connectivity to the EKS API.
 - Reassess this decision if the Jenkins network or deployment architecture changes.
+
+## CKV2_AWS_11 — VPC Flow Logs
+
+Status: Deferred — enable before production deployment.
+
+Checkov 3.3.30 reports that VPC Flow Logs are not enabled for
+`aws_vpc.main` in `network.tf`.
+
+VPC Flow Logs provide network traffic metadata that can help investigate
+connectivity issues and suspicious traffic. They do not capture packet
+payloads. Sending logs to CloudWatch Logs or S3 can incur ingestion,
+storage, and related charges.
+
+Decision:
+- Do not create logging resources solely to clear this finding in the
+  currently inactive, cost-conscious lab.
+- Before production deployment, assess security and compliance requirements
+  and enable VPC Flow Logs with an approved destination and retention policy.
+- Estimate logging costs using expected traffic volume and destination
+  pricing before enabling collection.
+- Do not suppress the Checkov finding or modify the installed policy.
