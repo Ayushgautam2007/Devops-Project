@@ -36,6 +36,22 @@ pipeline {
                 }
             }
         }
+
+        stage('Checkov Security Scan') {
+            steps {
+                sh '''
+                    set +e
+                    /opt/checkov-venv/bin/checkov \
+                        --directory terraform \
+                        --framework terraform \
+                        --compact
+                    rc=$?
+                    echo "Checkov exit code: $rc"
+                    echo "Review failed security checks above; this stage is report-only."
+                    exit 0
+                '''
+            }
+        }
     }
 
     post {
