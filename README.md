@@ -46,15 +46,16 @@ Terraform VPC/EKS -> Kubernetes Deployment and Service
 - Terraform
 - Kubernetes YAML manifests
 
-GitHub push webhook delivery and automatic execution of the safe
-Webhook-Test job have been verified. The production `Testing` job's webhook
-trigger is configured, but automatic production execution has not yet been
-verified end to end.
+GitHub push webhook delivery and automatic execution of the production
+`Testing` pipeline have been verified end to end. Build `44` was triggered
+by a GitHub push and completed successfully, including deployment and
+post-deployment validation.
 
 Ansible playbooks and the dedicated Jenkins Ansible-Health-Check job have
-been validated against the Docker application server. Live EKS deployment,
-Prometheus/Grafana, and notifications remain pending validation in the
-current environment.
+been validated against the Docker application server. The production pipeline
+also runs `docker_health.yml` after deployment. The EKS cluster is currently
+absent. Prometheus, Grafana, and Node Exporter are configured on the Jenkins
+host; alert-notification delivery still requires validation.
 
 ## 5. Repository Structure
 
@@ -65,9 +66,9 @@ current environment.
 - `k8s/deployment.yaml` - Kubernetes Namespace and Deployment
 - `k8s/service.yaml` - Kubernetes Service
 - `k8s/ingress.yaml` - AWS ALB Ingress configuration
-Terraform configuration is currently maintained outside this Git
-repository on the Jenkins controller. See Section 11 for its location.
-The Terraform files are not included in the tracked GitHub repository.
+
+Terraform configuration is maintained locally on the Jenkins controller,
+outside this Git repository. See Section 11 for its location.
 
 ## 6. Local Development
 
@@ -125,8 +126,8 @@ ECR repository:
 
     351083991382.dkr.ecr.ap-south-1.amazonaws.com/devops-flask-api
 
-Images use Jenkins build numbers as tags. Build `27` was verified
-as deployed and healthy during project validation.
+Images use Jenkins build numbers as tags. Build `44` is the latest
+verified production deployment and was confirmed healthy after deployment.
 
 ## 10. Kubernetes
 
@@ -180,14 +181,30 @@ Do not apply or destroy infrastructure without reviewing the plan.
 
 ## 13. Validation Evidence
 
-Latest verified production deployment build: `27`
+Latest verified production deployment build: `44`
+
+Build `44` evidence:
+- Trigger: GitHub push (`GitHubPushCause`).
+- Git branch: `main`.
+- Git commit: `3192b99578ca934b57618a304994f871a8fe3788`.
+- ECR image: `devops-flask-api:44`.
+- Pipeline result: `SUCCESS`.
+- Candidate and production `/health` checks returned
+  `{"status":"healthy"}`.
+- The previous production container was preserved as
+  `flask-api-rollback-44`.
+- Ansible post-deployment validation passed.
+
+Build `27` is retained below as historical validation evidence.
 
 Webhook validation:
 - GitHub `push` delivery returned HTTP `200`.
 - `Webhook-Test` started automatically with `Started by GitHub push`.
 - Repository checkout succeeded at commit `7192332285ccdef34859ce2fad7704c128b3c369`.
-- Safe webhook verification completed successfully without Docker build,
-  ECR push, or production deployment.
+- This records the earlier safe `Webhook-Test` verification, which did
+  not build an image, push to ECR, or deploy to production.
+- Production webhook verification was subsequently confirmed by Build `44`,
+  which was started by a GitHub push and completed successfully.
 
 Application tests:
 - `tests/test_app.py`: 3 passed (`test_home`, `test_health`, `test_users`).
@@ -211,8 +228,10 @@ Ansible validation:
 - Health-check recap: `ok=6`, `changed=0`, `unreachable=0`, `failed=0`.
 - Disk check passed with root filesystem usage below the 80% threshold.
 - Ansible commit: `9d210a0` (`feat(ansible): add server health and disk validation playbooks`).
-- These checks validate remote health and basic disk/system checks; they do
-  not yet constitute automatic Ansible execution in the production pipeline.
+- The production pipeline runs `docker_health.yml` after deployment.
+  `system_info.yml` and `disk_check.yml` have been validated through the
+  dedicated Ansible health-check workflow; do not assume they run in every
+  production deployment.
 
 Latest previously verified documentation/manifests commit in GitHub: `7192332`
 - Added `k8s/deployment.yaml`, `k8s/service.yaml`, and `k8s/ingress.yaml`.
@@ -223,13 +242,13 @@ Latest previously verified documentation/manifests commit in GitHub: `7192332`
 
 ## 14. Remaining Work
 
-- Recreate and validate EKS when budget permits.
-- Deploy Kubernetes manifests and verify the ALB endpoint.
-- Integrate Ansible playbooks into the production pipeline (pending; currently run via a dedicated manual Jenkins job).
-- Configure Prometheus/Grafana and alert notifications.
+- Recreate and validate EKS when budget permits, then deploy the
+  Kubernetes manifests and verify the ALB endpoint.
+- Decide whether `system_info.yml` and `disk_check.yml` should also run
+  automatically in the production pipeline.
+- Validate alert-notification delivery from the monitoring setup.
 - Validate automated rollback in a controlled test.
-- Verify and document the GitHub push trigger for the production `Testing` job.
-- Capture final architecture, pipeline, and monitoring evidence.
+- Capture any remaining architecture, pipeline, and monitoring evidence.
 
 ## 15. Cost Management
 
