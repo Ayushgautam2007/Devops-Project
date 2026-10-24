@@ -61,10 +61,9 @@ monitoring and alerting are documented separately from this EKS test.
 - Terraform
 - Kubernetes YAML manifests
 
-GitHub push webhook delivery and automatic execution of the safe
-Webhook-Test job have been verified. The production `Testing` job's webhook
-trigger is configured, but automatic production execution has not yet been
-verified end to end.
+GitHub push webhook delivery and automatic execution of both
+`Webhook-Test` and the production `Testing` job have been verified.
+Jenkins build #48 was triggered by a GitHub push and completed successfully.
 
 Ansible playbooks and the dedicated Jenkins Ansible-Health-Check job have
 been validated against the Docker application server. Live EKS deployment,
@@ -204,7 +203,10 @@ EKS worker nodes, and other AWS resources can incur charges.
 ## 13. Validation Evidence
 
 ### Docker CI/CD and application
-- Latest previously documented production deployment image: ECR tag `27`.
+- Latest verified production deployment: Jenkins build `#48` on 2026-10-24.
+- Build `#48` checked out commit `e2a435f` and completed with `SUCCESS`.
+- Candidate and production health checks passed; previous production
+  container was preserved as `flask-api-rollback-48`.
 - `tests/test_app.py`: 3 tests passed (`test_home`, `test_health`, `test_users`).
 - The production Docker deployment health check returned
   `{"status":"healthy"}`.
@@ -214,8 +216,10 @@ EKS worker nodes, and other AWS resources can incur charges.
 ### Webhook and Jenkins
 - GitHub push delivery returned HTTP `200`.
 - `Webhook-Test` ran automatically following a GitHub push.
-- The production `Testing` job webhook trigger was configured, but
-  fully automatic production execution still needs explicit verification.
+- Jenkins service logs confirmed a GitHub push event and automatic
+  triggering of `Testing #48`.
+- Build `#48` XML recorded `GitHubPushCause`; the build completed with
+  `SUCCESS`.
 
 ### Ansible
 - Tracked playbooks: `ansible/playbooks/system_info.yml`,
@@ -223,7 +227,7 @@ EKS worker nodes, and other AWS resources can incur charges.
 - Jenkins job `Ansible-Health-Check` completed with `SUCCESS`.
 - Docker service was active and the remote Flask health endpoint was healthy.
 - Disk validation passed below the configured 80% root filesystem threshold.
-- Jenkins `Testing` build `#45` completed with `SUCCESS` on 2026-10-23.
+- Jenkins `Testing` build `#48` completed with `SUCCESS` on 2026-10-24.
 - The `Ansible Post-Deployment Validation` stage ran
   `docker_health.yml` and `disk_check.yml`.
 - The build log confirmed `ANSIBLE POST-DEPLOYMENT VALIDATION PASSED`.
@@ -252,11 +256,14 @@ they remain active in the current environment.
   if the EKS lab is no longer needed for a live demonstration.
 - Verify remaining AWS billable resources after cleanup, including NAT
   Gateways, Elastic IPs, EKS resources, and unattached storage.
-- Verify automatic production `Testing` job execution from a GitHub push.
-- Perform and document a controlled automated rollback test.
-- Review the latest Jenkins build log to confirm Ansible post-deployment
-  validation ran successfully in the production pipeline.
-- Capture and retain final CI/CD, EKS/ALB, and monitoring evidence.
+- Perform and document a controlled automated rollback test; rollback
+  logic is implemented, but failure-triggered recovery has not yet been
+  demonstrated by build `#48`.
+- Verify current monitoring hosts and alert evidence before claiming
+  Prometheus/Grafana remain active.
+- Decide whether to retain or clean up the provisioned EKS/VPC/NAT
+  infrastructure after reviewing cost and demo requirements.
+- Retain final CI/CD, EKS/ALB, Terraform validation, and monitoring evidence.
 - Reconcile monitoring documentation with the current running state.
 
 ## 15. Cost Management
