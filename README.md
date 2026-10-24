@@ -2,13 +2,20 @@
 
 ## 1. Project Overview
 
-This project demonstrates a CI/CD workflow for a Dockerized Flask API
-using Jenkins, GitHub, Amazon ECR, and a remote Docker host.
+This project demonstrates a Flask API CI/CD workflow using Jenkins,
+GitHub, Amazon ECR, Docker, and a remote Docker host. It also includes
+Terraform configuration, Kubernetes manifests, Ansible validation, and
+Prometheus/Grafana monitoring work.
 
-Terraform configuration and Kubernetes manifests are maintained for
-the planned AWS EKS deployment.
+The EKS deployment and internet-facing AWS Application Load Balancer
+were provisioned and tested successfully on 2026-10-24. The public API
+endpoints and both ALB targets returned healthy results. The ALB and
+application namespace were subsequently removed to reduce lab costs;
+Terraform-managed EKS infrastructure cleanup remains to be completed.
 
 ## 2. Architecture
+
+Validated Docker CI/CD flow:
 
 Developer
   -> GitHub repository (main)
@@ -18,14 +25,22 @@ Developer
   -> Docker image build
   -> Amazon ECR image push
   -> Remote Docker deployment
-  -> Candidate health check
-  -> Production health check
+  -> Candidate and production health checks
   -> Deployment audit log
+  -> Ansible post-deployment validation
 
-Planned extension:
-Terraform VPC/EKS -> Kubernetes Deployment and Service
--> AWS Load Balancer Controller / ALB
--> Prometheus/Grafana monitoring and notifications
+Validated Kubernetes deployment flow (2026-10-24):
+
+Terraform VPC/EKS
+  -> Kubernetes Deployment (2 replicas) and Service
+  -> AWS Load Balancer Controller
+  -> Internet-facing ALB
+  -> Public Flask API endpoints
+
+The ALB returned HTTP 200 for `/health`, `/`, and `/api/users`.
+Both registered pod IP targets reported `healthy`. The ALB and
+application namespace were deleted after validation. Prometheus/Grafana
+monitoring and alerting are documented separately from this EKS test.
 
 ## 3. Application Endpoints
 
@@ -142,14 +157,20 @@ Files:
 
 The Deployment specifies two replicas, non-root execution,
 resource requests and limits, and readiness/liveness probes.
+The manifest references ECR image tag `27`.
 
-The deployment manifest currently references image tag `27`.
-For future deployments, update the image tag from the pipeline or
-use a deployment step that injects the current immutable build tag.
+EKS validation completed on 2026-10-24:
+- Cluster `devops-capstone-eks` reached `ACTIVE`.
+- Managed node group `devops-capstone-nodes` reached `ACTIVE`.
+- Both application replicas were available on separate worker nodes.
+- Internal service requests succeeded for `/health`, `/`, and `/api/users`.
+- Public ALB requests for all three endpoints returned HTTP `200 OK`.
+- Both ALB target group targets reported `healthy`.
 
-The EKS cluster is currently absent to avoid ongoing AWS costs.
-These manifests have not been verified against a currently running
-cluster in the present environment.
+After validation, the Ingress and `devops-capstone` application namespace
+were deleted, and the ALB Controller Helm release was uninstalled.
+The ALB and its associated target group were confirmed absent. The
+Terraform-managed EKS/VPC/NAT infrastructure cleanup is still pending.
 
 ## 11. Terraform
 
@@ -158,15 +179,17 @@ outside this GitHub repository:
 
     /var/lib/jenkins/terraform-eks-capstone
 
-The directory contains configuration files for the VPC, networking,
-EKS cluster, managed node group, and outputs. It also contains local
-Terraform working data and saved plan files; do not commit those files
-without reviewing their contents for sensitive information.
+The configuration manages the VPC, networking, EKS cluster, managed
+node group, IAM roles, and outputs. Terraform working data and saved
+plans are local; do not commit them without reviewing for sensitive data.
 
-The EKS cluster is currently absent. Do not apply the configuration
-without reviewing the plan and confirming the expected AWS costs.
-NAT Gateways, load balancers, EC2 instances, and EKS can incur charges.
-Do not apply or destroy infrastructure without reviewing the plan.
+The EKS lab was provisioned and validated on 2026-10-24. A reviewed
+destroy plan proposed destroying 24 Terraform-managed resources, with
+zero additions and zero changes. That plan has not yet been applied.
+
+Review the plan and confirm before destroying infrastructure. Preserve
+the remote Terraform state bucket and unrelated resources. NAT Gateways,
+EKS worker nodes, and other AWS resources can incur charges.
 
 ## 12. Security Notes
 
@@ -180,56 +203,61 @@ Do not apply or destroy infrastructure without reviewing the plan.
 
 ## 13. Validation Evidence
 
-Latest verified production deployment build: `27`
-
-Webhook validation:
-- GitHub `push` delivery returned HTTP `200`.
-- `Webhook-Test` started automatically with `Started by GitHub push`.
-- Repository checkout succeeded at commit `7192332285ccdef34859ce2fad7704c128b3c369`.
-- Safe webhook verification completed successfully without Docker build,
-  ECR push, or production deployment.
-
-Application tests:
-- `tests/test_app.py`: 3 passed (`test_home`, `test_health`, `test_users`).
-- Test command: `.venv/bin/python -m pytest -v tests/test_app.py`.
-
-Evidence from that pipeline run:
-- Git branch: `main`
-- Git commit: `2ccfeb71d9f77724cddadee0886ebb57a2ab5ba7`
-- ECR image: `devops-flask-api:27`
-- Pipeline result: `SUCCESS`
-- Production `/health`: `{"status":"healthy"}`
-- Previous production image `:26` was preserved as a rollback container.
-
-Ansible validation:
-- Tracked playbooks: `system_info.yml`, `docker_health.yml`, and `disk_check.yml`.
-- Inventory: `ansible/inventory/hosts.ini`; configuration: `ansible/ansible.cfg`.
-- All three playbooks passed syntax checks.
-- Jenkins job `Ansible-Health-Check` completed with `SUCCESS`.
-- Remote Docker service was `active`; Flask `/health` returned
+### Docker CI/CD and application
+- Latest previously documented production deployment image: ECR tag `27`.
+- `tests/test_app.py`: 3 tests passed (`test_home`, `test_health`, `test_users`).
+- The production Docker deployment health check returned
   `{"status":"healthy"}`.
-- Health-check recap: `ok=6`, `changed=0`, `unreachable=0`, `failed=0`.
-- Disk check passed with root filesystem usage below the 80% threshold.
-- Ansible commit: `9d210a0` (`feat(ansible): add server health and disk validation playbooks`).
-- These checks validate remote health and basic disk/system checks; they do
-  not yet constitute automatic Ansible execution in the production pipeline.
+- The previous image was preserved as a rollback container during
+  deployment validation.
 
-Latest previously verified documentation/manifests commit in GitHub: `7192332`
-- Added `k8s/deployment.yaml`, `k8s/service.yaml`, and `k8s/ingress.yaml`.
-- All three files passed local YAML syntax validation.
-- Live Kubernetes API/schema validation and EKS deployment have not
-  been verified because the EKS cluster is currently absent.
-- Automated rollback testing remains pending.
+### Webhook and Jenkins
+- GitHub push delivery returned HTTP `200`.
+- `Webhook-Test` ran automatically following a GitHub push.
+- The production `Testing` job webhook trigger was configured, but
+  fully automatic production execution still needs explicit verification.
+
+### Ansible
+- Tracked playbooks: `ansible/playbooks/system_info.yml`,
+  `ansible/playbooks/docker_health.yml`, and `ansible/playbooks/disk_check.yml`.
+- Jenkins job `Ansible-Health-Check` completed with `SUCCESS`.
+- Docker service was active and the remote Flask health endpoint was healthy.
+- Disk validation passed below the configured 80% root filesystem threshold.
+- Jenkins `Testing` build `#45` completed with `SUCCESS` on 2026-10-23.
+- The `Ansible Post-Deployment Validation` stage ran
+  `docker_health.yml` and `disk_check.yml`.
+- The build log confirmed `ANSIBLE POST-DEPLOYMENT VALIDATION PASSED`.
+
+### EKS, Kubernetes, and ALB — 2026-10-24
+- EKS cluster and managed node group reached `ACTIVE`.
+- Two worker nodes were `Ready`.
+- Kubernetes Deployment had 2 available application replicas.
+- Internal `/health`, `/`, and `/api/users` requests succeeded.
+- Public ALB requests for `/health`, `/`, and `/api/users` all returned
+  `HTTP/1.1 200 OK`.
+- ALB target group reported both pod IP targets as `healthy`.
+- ALB and its target group were subsequently confirmed absent after cleanup.
+- Application namespace and ALB Controller Helm release were removed.
+- Terraform destroy plan: `0 to add, 0 to change, 24 to destroy`.
+  The plan was reviewed but not applied at the time of this update.
+
+### Monitoring
+Prometheus/Grafana and alerting were previously configured and tested.
+Recheck the monitoring hosts and current alert evidence before claiming
+they remain active in the current environment.
 
 ## 14. Remaining Work
 
-- Recreate and validate EKS when budget permits.
-- Deploy Kubernetes manifests and verify the ALB endpoint.
-- Integrate Ansible playbooks into the production pipeline (pending; currently run via a dedicated manual Jenkins job).
-- Configure Prometheus/Grafana and alert notifications.
-- Validate automated rollback in a controlled test.
-- Verify and document the GitHub push trigger for the production `Testing` job.
-- Capture final architecture, pipeline, and monitoring evidence.
+- Apply the reviewed Terraform destroy plan after explicit confirmation,
+  if the EKS lab is no longer needed for a live demonstration.
+- Verify remaining AWS billable resources after cleanup, including NAT
+  Gateways, Elastic IPs, EKS resources, and unattached storage.
+- Verify automatic production `Testing` job execution from a GitHub push.
+- Perform and document a controlled automated rollback test.
+- Review the latest Jenkins build log to confirm Ansible post-deployment
+  validation ran successfully in the production pipeline.
+- Capture and retain final CI/CD, EKS/ALB, and monitoring evidence.
+- Reconcile monitoring documentation with the current running state.
 
 ## 15. Cost Management
 
