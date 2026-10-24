@@ -2,7 +2,7 @@
 
 ## CKV_AWS_58 — EKS secrets encryption
 
-Status: Reviewed — default encryption behavior; live cluster not verified.
+Status: Checkov FAIL — design reviewed; live cluster not verified.
 
 The Terraform configuration specifies Kubernetes version 1.37.
 AWS documentation states that Amazon EKS provides default envelope
@@ -26,7 +26,7 @@ Decision:
 
 ## CKV_AWS_39 — EKS public API endpoint
 
-Status: Addressed in Terraform configuration; not verified on a live cluster.
+Status: Single-file Checkov scan PASS; full-scan discrepancy unresolved.
 
 The Terraform configuration enables private API endpoint access and
 disables public API endpoint access (`endpoint_public_access = false`).
@@ -64,7 +64,7 @@ Decision:
 
 ## CKV_AWS_339 — EKS Kubernetes version
 
-Status: Reviewed — outdated Checkov 3.3.30 policy.
+Status: Checkov FAIL — possible policy-version mismatch under review.
 
 The Terraform configuration specifies Kubernetes version 1.37.
 Amazon EKS officially supports Kubernetes 1.37, released on
@@ -80,3 +80,27 @@ Decision:
 - Retain version 1.37 while it remains supported by Amazon EKS.
 - Do not modify the installed Checkov policy or suppress the finding.
 - Reassess this result when Checkov is upgraded.
+
+## Latest validation evidence — 2026-10-24
+
+A targeted Checkov 3.3.30 scan of `terraform/eks.tf` produced:
+- CKV_AWS_39: PASS
+- CKV_AWS_58: FAIL
+- CKV_AWS_339: FAIL
+
+The Terraform Validate Jenkins build #9 full scan reported four failed
+checks: CKV_AWS_339, CKV_AWS_39, CKV_AWS_58, and CKV2_AWS_11.
+Because CKV_AWS_39 differs between the full scan and targeted scan,
+the discrepancy remains unresolved; do not mark the full scan as clean.
+
+The Checkov stage is report-only, so Jenkins build #9 finished SUCCESS
+even though four security checks failed. Terraform formatting,
+initialization, and validation passed. No infrastructure was applied
+by that validation job.
+
+Next actions:
+- Investigate why CKV_AWS_39 differs between full and targeted scans.
+- Reassess CKV_AWS_58 against current AWS EKS encryption requirements.
+- Verify the CKV_AWS_339 policy's supported Kubernetes-version list.
+- Keep VPC Flow Logs deferred for the cost-conscious lab; reassess before
+  production deployment.
