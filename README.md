@@ -260,10 +260,23 @@ EKS worker nodes, and other AWS resources can incur charges.
 - Tracked `k8s/deployment.yaml` still references image tag `27`.
 - No Terraform apply or destroy was performed for this validation.
 
-### Monitoring
-Prometheus/Grafana and alerting were previously configured and tested.
-Recheck the monitoring hosts and current alert evidence before claiming
-they remain active in the current environment.
+### Monitoring — 2026-10-26
+- The four configured Prometheus production rules were present with
+  `health: ok`: `NodeExporterDown`, `HighCPUUsage`, `HighMemoryUsage`,
+  and `LowDiskSpace`.
+- The temporary `PrometheusGmailFiringTest` rule using `vector(1)` passed
+  `promtool` validation, and Prometheus reloaded the configuration.
+- Alertmanager received the test alert and routed it to
+  `gmail-notifications`.
+- Gmail delivery was verified for both `[FIRING:1] PrometheusGmailFiringTest
+  (warning)` and `[RESOLVED] PrometheusGmailFiringTest (warning)`.
+- The temporary test rule was removed, Prometheus was reloaded, and the
+  rules API subsequently showed only the four production rules.
+- This verifies the Prometheus-to-Alertmanager-to-Gmail notification path.
+  Individual real CPU, memory, disk, and Node Exporter failure scenarios
+  have not been demonstrated by this temporary test.
+- Recheck current monitoring host availability and Grafana dashboard
+  functionality before claiming they are currently operational.
 
 ## 14. Remaining Work
 
@@ -274,8 +287,8 @@ they remain active in the current environment.
 - Perform and document a controlled automated rollback test; rollback
   logic is implemented, but failure-triggered recovery has not yet been
   demonstrated by build `#48`.
-- Verify current monitoring hosts and alert evidence before claiming
-  Prometheus/Grafana remain active.
+- Recheck current Prometheus, Alertmanager, and Grafana availability;
+  validate individual production alert scenarios when practical.
 - Decide whether to retain or clean up the provisioned EKS/VPC/NAT
   infrastructure after reviewing cost and demo requirements.
 - Retain final CI/CD, EKS/ALB, Terraform validation, and monitoring evidence.
