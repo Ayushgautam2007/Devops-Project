@@ -8,10 +8,11 @@ Terraform configuration, Kubernetes manifests, Ansible validation, and
 Prometheus/Grafana monitoring work.
 
 The EKS deployment and internet-facing AWS Application Load Balancer
-were provisioned and tested successfully on 2026-10-24. The public API
-endpoints and both ALB targets returned healthy results. The ALB and
-application namespace were subsequently removed to reduce lab costs;
-Terraform-managed EKS infrastructure cleanup remains to be completed.
+were first validated on 2026-10-24. The environment was redeployed and
+validated again on 2026-10-26. The current deployment uses ECR image tag
+`49`, with two available application replicas and two healthy ALB targets.
+The `/health` and `/api/users` endpoints returned HTTP 200. The EKS
+environment and ALB are currently active and may incur AWS charges.
 
 ## 2. Architecture
 
@@ -37,10 +38,11 @@ Terraform VPC/EKS
   -> Internet-facing ALB
   -> Public Flask API endpoints
 
-The ALB returned HTTP 200 for `/health`, `/`, and `/api/users`.
-Both registered pod IP targets reported `healthy`. The ALB and
-application namespace were deleted after validation. Prometheus/Grafana
-monitoring and alerting are documented separately from this EKS test.
+The 2026-10-24 ALB validation returned HTTP 200 for `/health`, `/`,
+and `/api/users`; that test environment was subsequently cleaned up.
+On 2026-10-26, the environment was redeployed and validated again.
+Current deployment evidence is recorded in Section 13. Prometheus/Grafana
+monitoring and alerting are documented separately.
 
 ## 3. Application Endpoints
 
@@ -156,20 +158,31 @@ Files:
 
 The Deployment specifies two replicas, non-root execution,
 resource requests and limits, and readiness/liveness probes.
-The manifest references ECR image tag `27`.
+The tracked `k8s/deployment.yaml` manifest references ECR image tag
+`27`. The live deployment validated on 2026-10-26 uses image tag `49`,
+applied from a temporary manifest; the tracked manifest was not changed.
 
-EKS validation completed on 2026-10-24:
-- Cluster `devops-capstone-eks` reached `ACTIVE`.
-- Managed node group `devops-capstone-nodes` reached `ACTIVE`.
+EKS validation on 2026-10-24:
+- Cluster and managed node group reached `ACTIVE`.
 - Both application replicas were available on separate worker nodes.
-- Internal service requests succeeded for `/health`, `/`, and `/api/users`.
-- Public ALB requests for all three endpoints returned HTTP `200 OK`.
+- Public ALB endpoints returned HTTP `200 OK`.
 - Both ALB target group targets reported `healthy`.
+- That test environment was subsequently cleaned up.
 
-After validation, the Ingress and `devops-capstone` application namespace
-were deleted, and the ALB Controller Helm release was uninstalled.
-The ALB and its associated target group were confirmed absent. The
-Terraform-managed EKS/VPC/NAT infrastructure cleanup is still pending.
+EKS redeployment validation on 2026-10-26:
+- Cluster `devops-capstone-eks` and two worker nodes were active/ready.
+- Deployment `devops-flask-api` had 2/2 available replicas using image `:49`.
+- Both pods were `Running`, ready, and had zero restarts.
+- Both ALB targets (`10.20.11.133:8080` and `10.20.12.19:8080`)
+  reported `Healthy`.
+- ALB `/health` and `/api/users` requests returned HTTP `200 OK`.
+- Twenty repeated ALB `/health` requests returned HTTP `200`.
+- Direct `/health` checks to each pod returned HTTP `200`.
+- The current Ingress uses the internet-facing ALB on HTTP port 80.
+
+The EKS environment and ALB are currently active. Review AWS costs
+before leaving the lab running. Terraform-managed resources have not
+been destroyed as part of this validation.
 
 ## 11. Terraform
 
@@ -233,17 +246,19 @@ EKS worker nodes, and other AWS resources can incur charges.
 - The build log confirmed `ANSIBLE POST-DEPLOYMENT VALIDATION PASSED`.
 
 ### EKS, Kubernetes, and ALB — 2026-10-24
-- EKS cluster and managed node group reached `ACTIVE`.
-- Two worker nodes were `Ready`.
-- Kubernetes Deployment had 2 available application replicas.
-- Internal `/health`, `/`, and `/api/users` requests succeeded.
-- Public ALB requests for `/health`, `/`, and `/api/users` all returned
-  `HTTP/1.1 200 OK`.
-- ALB target group reported both pod IP targets as `healthy`.
-- ALB and its target group were subsequently confirmed absent after cleanup.
-- Application namespace and ALB Controller Helm release were removed.
-- Terraform destroy plan: `0 to add, 0 to change, 24 to destroy`.
-  The plan was reviewed but not applied at the time of this update.
+- Initial EKS deployment and ALB endpoint validation succeeded.
+- That test environment was subsequently cleaned up.
+
+### EKS, Kubernetes, and ALB — 2026-10-26
+- Deployment `devops-flask-api`: 2/2 replicas available, image tag `49`.
+- Both application pods were `Running`, ready, and had zero restarts.
+- Both ALB target group targets reported `Healthy`.
+- `/health` and `/api/users` through the ALB returned `HTTP/1.1 200 OK`.
+- Twenty repeated ALB `/health` requests returned HTTP 200.
+- Direct `/health` requests to both pods returned HTTP 200.
+- The current ALB and EKS application environment are active.
+- Tracked `k8s/deployment.yaml` still references image tag `27`.
+- No Terraform apply or destroy was performed for this validation.
 
 ### Monitoring
 Prometheus/Grafana and alerting were previously configured and tested.
