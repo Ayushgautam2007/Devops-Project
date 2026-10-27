@@ -33,7 +33,7 @@ spec:
           type: RuntimeDefault
       containers:
         - name: flask-api
-          image: 351083991382.dkr.ecr.ap-south-1.amazonaws.com/devops-flask-api:27
+          image: 351083991382.dkr.ecr.ap-south-1.amazonaws.com/devops-flask-api:49
           imagePullPolicy: IfNotPresent
           ports:
             - name: http
