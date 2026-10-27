@@ -1,306 +1,712 @@
-# DevOps Capstone: Flask CI/CD on AWS
+# DevOps CI/CD Capstone Project
+
+A Flask-based DevOps capstone demonstrating automated testing, Docker image creation, Amazon ECR publishing, Jenkins-driven deployment, Ansible validation, Kubernetes deployment on Amazon EKS, AWS Application Load Balancer integration, monitoring, alert testing, and deployment recovery analysis.
+
+## Table of Contents
+
+1. [Project Overview](#1-project-overview)
+2. [Project Objectives](#2-project-objectives)
+3. [Architecture](#3-architecture)
+4. [Technology Stack](#4-technology-stack)
+5. [Application Overview](#5-application-overview)
+6. [Repository Structure](#6-repository-structure)
+7. [CI/CD Pipeline](#7-cicd-pipeline)
+8. [Docker and Amazon ECR](#8-docker-and-amazon-ecr)
+9. [Ansible Validation](#9-ansible-validation)
+10. [Kubernetes and Amazon EKS](#10-kubernetes-and-amazon-eks)
+11. [Terraform Infrastructure](#11-terraform-infrastructure)
+12. [Prometheus, Alertmanager and Gmail](#12-prometheus-alertmanager-and-gmail)
+13. [Deployment Recovery and Rollback Testing](#13-deployment-recovery-and-rollback-testing)
+14. [Validation Evidence](#14-validation-evidence)
+15. [Security Practices](#15-security-practices)
+16. [Cost Management](#16-cost-management)
+17. [Current Project Status](#17-current-project-status)
+18. [Remaining Work](#18-remaining-work)
+19. [Troubleshooting](#19-troubleshooting)
+
+---
 
 ## 1. Project Overview
 
-This project demonstrates a Flask API CI/CD workflow using Jenkins,
-GitHub, Amazon ECR, Docker, and a remote Docker host. It also includes
-Terraform configuration, Kubernetes manifests, Ansible validation, and
-Prometheus/Grafana monitoring work.
+This project implements a practical DevOps workflow for a Python Flask application using Jenkins, GitHub, Docker, Amazon Elastic Container Registry (ECR), and AWS infrastructure.
 
-The EKS deployment and internet-facing AWS Application Load Balancer
-were first validated on 2026-10-24. The environment was redeployed and
-validated again on 2026-10-26. The current deployment uses ECR image tag
-`49`, with two available application replicas and two healthy ALB targets.
-The `/health` and `/api/users` endpoints returned HTTP 200. The EKS
-environment and ALB are currently active and may incur AWS charges.
+The project also includes Kubernetes manifests, Terraform configuration, Ansible playbooks, and monitoring and alerting validation.
 
-## 2. Architecture
+The primary workflow automates application testing, image building, image publishing, deployment to a remote Docker server, and post-deployment health checks.
 
-Validated Docker CI/CD flow:
+Additional work demonstrates deployment to Amazon EKS behind an AWS Application Load Balancer (ALB), Prometheus alert-rule testing, Gmail notifications, and isolated deployment failure-path tests.
 
+### Key capabilities
+
+- GitHub push webhook integration with Jenkins.
+- Automated Python unit tests using pytest.
+- Docker image build and publishing to Amazon ECR.
+- Remote application deployment over SSH.
+- Application health checks and deployment audit logging.
+- Preservation of the previous container image for rollback.
+- Ansible-based Docker and disk validation.
+- Kubernetes deployment and service configuration.
+- Amazon EKS and ALB application validation.
+- Prometheus alert-rule testing and Gmail notification validation.
+- Isolated mock tests for deployment failure and recovery branches.
+- Terraform-based AWS infrastructure configuration.
+
+**Important:** Successful component validation does not automatically establish that every component is currently running or that every end-to-end recovery scenario has been verified. Current status and remaining validation are documented below.
+
+## 2. Project Objectives
+
+The objectives of this project are to:
+
+1. Automate application testing and deployment.
+2. Integrate source control with Jenkins using GitHub webhooks.
+3. Build and publish versioned container images.
+4. Deploy application containers to a remote Docker host.
+5. Verify deployments using application health endpoints.
+6. Validate remote infrastructure with Ansible.
+7. Deploy and expose an application using Kubernetes, EKS, and ALB.
+8. Test monitoring rules and alert notifications.
+9. Investigate deployment failure handling and rollback behavior.
+10. Document security considerations, validation results, and AWS cost exposure.
+
+## 3. Architecture
+
+### 3.1 CI/CD deployment flow
+
+```text
 Developer
-  -> GitHub repository (main)
-  -> GitHub push webhook
-  -> Jenkins pipeline
-  -> Automated pytest tests
-  -> Docker image build
-  -> Amazon ECR image push
-  -> Remote Docker deployment
-  -> Candidate and production health checks
-  -> Deployment audit log
-  -> Ansible post-deployment validation
+   |
+   v
+GitHub Repository
+   |
+   | Push webhook
+   v
+Jenkins Pipeline
+   |
+   +--> Checkout source code
+   |
+   +--> Install dependencies and run pytest
+   |
+   +--> Build Docker image
+   |
+   +--> Authenticate to Amazon ECR
+   |
+   +--> Push versioned image
+   |
+   +--> Connect to remote Docker server over SSH
+   |
+   +--> Start candidate container
+   |
+   +--> Validate application health
+   |
+   +--> Switch production container
+   |
+   +--> Verify deployment and record audit evidence
+   |
+   +--> Run Ansible post-deployment validation
+```
 
-Validated Kubernetes deployment flow (2026-10-24):
+The production deployment process includes candidate and production health checks and preservation of the previous container for recovery attempts. Actual rollback recovery and traffic recovery are not yet established by the isolated mock tests alone.
 
-Terraform VPC/EKS
-  -> Kubernetes Deployment (2 replicas) and Service
-  -> AWS Load Balancer Controller
-  -> Internet-facing ALB
-  -> Public Flask API endpoints
+### 3.2 Kubernetes and monitoring architecture
 
-The 2026-10-24 ALB validation returned HTTP 200 for `/health`, `/`,
-and `/api/users`; that test environment was subsequently cleaned up.
-On 2026-10-26, the environment was redeployed and validated again.
-Current deployment evidence is recorded in Section 13. Prometheus/Grafana
-monitoring and alerting are documented separately.
+```text
+GitHub / Application Image
+           |
+           v
+    Amazon ECR
+           |
+           v
+    Amazon EKS
+           |
+           v
+ Kubernetes Deployment
+           |
+           v
+ Kubernetes Service
+           |
+           v
+ AWS Application Load Balancer
+           |
+           v
+     Flask Application
 
-## 3. Application Endpoints
+Monitoring:
+Prometheus --> Alertmanager --> Gmail notifications
+```
 
-- `/` - Application welcome message
-- `/health` - Application health check
-- `/api/users` - User API
+The Kubernetes deployment and ALB flow was validated during the documented EKS lab sessions. Monitoring rule tests and Gmail notification tests were also completed. See the validation evidence for dates and limitations.
 
 ## 4. Technology Stack
 
-- Python and Flask
-- Gunicorn
-- pytest
-- Docker
-- Git and GitHub
-- Jenkins
-- Amazon ECR
-- AWS EC2
-- Terraform
-- Kubernetes YAML manifests
+| Category | Technology |
+|---|---|
+| Operating system and administration | Linux, Amazon Linux |
+| Application | Python, Flask |
+| Automated testing | pytest |
+| Source control | Git, GitHub |
+| CI/CD | Jenkins |
+| Containerization | Docker |
+| Container registry | Amazon ECR |
+| Cloud platform | AWS |
+| Infrastructure as Code | Terraform |
+| Configuration and validation | Ansible |
+| Container orchestration | Kubernetes, Amazon EKS |
+| Load balancing | AWS Application Load Balancer |
+| Monitoring | Prometheus |
+| Alert routing | Alertmanager |
+| Notifications | Gmail SMTP |
+| Automation scripting | Bash, Python |
+| Application server | Gunicorn |
 
-GitHub push webhook delivery and automatic execution of both
-`Webhook-Test` and the production `Testing` job have been verified.
-Jenkins build #48 was triggered by a GitHub push and completed successfully.
+## 5. Application Overview
 
-Ansible playbooks and the dedicated Jenkins Ansible-Health-Check job have
-been validated against the Docker application server. Live EKS deployment,
-Prometheus/Grafana, and notifications remain pending validation in the
-current environment.
+The project provides a Flask REST API.
 
-## 5. Repository Structure
+### Endpoints
 
-- `app/app.py` - Flask application
-- `app/requirements.txt` - Python dependencies
-- `tests/test_app.py` - Application tests
-- `Dockerfile` - Container image definition
-- `k8s/deployment.yaml` - Kubernetes Namespace and Deployment
-- `k8s/service.yaml` - Kubernetes Service
-- `k8s/ingress.yaml` - AWS ALB Ingress configuration
-Terraform configuration is currently maintained outside this Git
-repository on the Jenkins controller. See Section 11 for its location.
-The Terraform files are not included in the tracked GitHub repository.
+| Endpoint | Purpose | Expected response |
+|---|---|---|
+| `/` | Application welcome endpoint | Welcome message and version |
+| `/health` | Application health check | `{"status":"healthy"}` |
+| `/api/users` | Example user API | JSON containing application users |
 
-## 6. Local Development
+Example health response:
 
-Install dependencies:
+```json
+{
+  "status": "healthy"
+}
+```
 
-    python -m pip install -r app/requirements.txt
+The application test suite covers the home endpoint, health endpoint, and users endpoint.
 
-Run tests from the repository root:
+### Run locally
 
-    python -m pytest -v tests/
+Prerequisites: Python and Git.
 
-## 7. Docker
+```bash
+git clone https://github.com/Ayushgautam2007/Devops-Project.git
+cd Devops-Project
 
-Build the image:
+python -m venv .venv
+source .venv/bin/activate
 
-    docker build -t flask-api:v1 .
+python -m pip install -r app/requirements.txt
+python -m pytest -v
+```
 
-Run the container locally:
+To run the Flask application, use the project's application entry point and the configured development or production server settings.
 
-    docker run -d --name flask-api \
-      -p 127.0.0.1:9090:8080 flask-api:v1
+For production deployments, use Gunicorn or the deployment configuration rather than Flask's development server.
 
-Check application health:
+## 6. Repository Structure
 
-    curl -fsS http://127.0.0.1:9090/health
+The principal tracked project files include:
 
-## 8. Jenkins CI/CD
+```text
+Devops-Project/
+├── app/
+│   ├── app.py
+│   └── requirements.txt
+├── tests/
+│   └── test_app.py
+├── Dockerfile
+├── Jenkinsfile
+├── README.md
+├── ansible/
+│   ├── ansible.cfg
+│   ├── inventory/
+│   └── playbooks/
+└── k8s/
+    ├── deployment.yaml
+    ├── service.yaml
+    └── ingress.yaml
+```
 
-Jenkins job: `Testing`
+The exact directory contents should be confirmed against the current Git checkout before adding or removing paths from this listing.
 
-Current pipeline stages:
+Terraform configuration is maintained separately on the Jenkins controller:
 
-1. Checkout the GitHub `main` branch
-2. Install test dependencies
-3. Run pytest
-4. Build a Docker image
-5. Push the image to Amazon ECR
-6. Start a candidate container on the remote Docker host
-7. Check candidate health
-8. Swap the production container
-9. Verify production health
-10. Print deployment audit information
+```text
+/var/lib/jenkins/terraform-eks-capstone
+```
 
-The pipeline records the build number, Git branch, commit SHA,
-image tag, and build result.
+The Terraform working directory and state-related artifacts are not part of the tracked GitHub repository.
 
-The production swap can cause brief downtime; it is not true
-zero-downtime deployment.
+## 7. CI/CD Pipeline
 
-## 9. Amazon ECR
+### Jenkins jobs
 
-AWS region: `ap-south-1`
+| Job | Purpose |
+|---|---|
+| `Testing` | Main CI/CD pipeline |
+| `Ansible-Health-Check` | Ansible connectivity and server validation |
+| `Webhook-Test` | GitHub push webhook verification |
 
-ECR repository:
+The `Testing` job uses an SCM-based Pipeline definition. Its configured branch is `*/main`, and its script path is `Jenkinsfile`, with lightweight checkout enabled.
 
-    351083991382.dkr.ecr.ap-south-1.amazonaws.com/devops-flask-api
+### Pipeline stages
 
-Images use Jenkins build numbers as tags. Build `27` was verified
-as deployed and healthy during project validation.
+The main pipeline has included the following activities:
 
-## 10. Kubernetes
+1. Checkout application source code.
+2. Install dependencies and run automated tests.
+3. Build a Docker image.
+4. Authenticate to Amazon ECR.
+5. Push the versioned image to ECR.
+6. Connect to the remote Docker server.
+7. Start and validate a candidate application container.
+8. Perform production deployment and health verification.
+9. Preserve the previous container for recovery attempts.
+10. Run Ansible post-deployment validation.
 
-Manifest directory:
+The exact current stage names and implementation should be checked against the tracked `Jenkinsfile` and the latest successful Jenkins build.
 
-    k8s/
+### GitHub webhook integration
 
-Files:
+The GitHub webhook endpoint is configured for Jenkins at:
 
-- `deployment.yaml`
-- `service.yaml`
-- `ingress.yaml`
+```text
+/github-webhook/
+```
 
-The Deployment specifies two replicas, non-root execution,
-resource requests and limits, and readiness/liveness probes.
-The tracked `k8s/deployment.yaml` manifest references ECR image tag
-`27`. The live deployment validated on 2026-10-26 uses image tag `49`,
-applied from a temporary manifest; the tracked manifest was not changed.
+Documented validation showed successful webhook delivery and automatic triggering of the `Webhook-Test` and production `Testing` jobs. Jenkins build `#48` was recorded as push-triggered and successful.
 
-EKS validation on 2026-10-24:
-- Cluster and managed node group reached `ACTIVE`.
-- Both application replicas were available on separate worker nodes.
-- Public ALB endpoints returned HTTP `200 OK`.
-- Both ALB target group targets reported `healthy`.
-- That test environment was subsequently cleaned up.
+### Pipeline validation
 
-EKS redeployment validation on 2026-10-26:
-- Cluster `devops-capstone-eks` and two worker nodes were active/ready.
-- Deployment `devops-flask-api` had 2/2 available replicas using image `:49`.
-- Both pods were `Running`, ready, and had zero restarts.
-- Both ALB targets (`10.20.11.133:8080` and `10.20.12.19:8080`)
-  reported `Healthy`.
-- ALB `/health` and `/api/users` requests returned HTTP `200 OK`.
-- Twenty repeated ALB `/health` requests returned HTTP `200`.
-- Direct `/health` checks to each pod returned HTTP `200`.
-- The current Ingress uses the internet-facing ALB on HTTP port 80.
+The application test suite has three tests:
 
-The EKS environment and ALB are currently active. Review AWS costs
-before leaving the lab running. Terraform-managed resources have not
-been destroyed as part of this validation.
+- `test_home`
+- `test_health`
+- `test_users`
 
-## 11. Terraform
+The documented test runs passed all three tests.
 
-Terraform configuration is stored locally on the Jenkins controller,
-outside this GitHub repository:
+### Deployment audit and health checks
 
-    /var/lib/jenkins/terraform-eks-capstone
+The deployment process performs application health checks and preserves deployment evidence. The application health endpoint is:
 
-The configuration manages the VPC, networking, EKS cluster, managed
-node group, IAM roles, and outputs. Terraform working data and saved
-plans are local; do not commit them without reviewing for sensitive data.
+```text
+/health
+```
 
-The EKS lab was provisioned and validated on 2026-10-24. A reviewed
-destroy plan proposed destroying 24 Terraform-managed resources, with
-zero additions and zero changes. That plan has not yet been applied.
+The remote production container has been observed returning:
 
-Review the plan and confirm before destroying infrastructure. Preserve
-the remote Terraform state bucket and unrelated resources. NAT Gateways,
-EKS worker nodes, and other AWS resources can incur charges.
+```json
+{"status":"healthy"}
+```
 
-## 12. Security Notes
+The pipeline's failure handling and rollback-related behavior are discussed in Section 13.
 
-- The application container runs as a non-root user.
-- Kubernetes configuration disables privilege escalation and drops
-  Linux capabilities.
-- Do not commit AWS credentials, SSH private keys, or secrets.
-- Restrict Jenkins and SSH access using security groups and approved
-  source IP ranges.
-- Review IAM permissions using least privilege.
+## 8. Docker and Amazon ECR
 
-## 13. Validation Evidence
+The application is packaged as a Docker image and published to Amazon ECR.
 
-### Docker CI/CD and application
-- Latest verified production deployment: Jenkins build `#48` on 2026-10-24.
-- Build `#48` checked out commit `e2a435f` and completed with `SUCCESS`.
-- Candidate and production health checks passed; previous production
-  container was preserved as `flask-api-rollback-48`.
-- `tests/test_app.py`: 3 tests passed (`test_home`, `test_health`, `test_users`).
-- The production Docker deployment health check returned
-  `{"status":"healthy"}`.
-- The previous image was preserved as a rollback container during
-  deployment validation.
+**AWS Region:** `ap-south-1`
 
-### Webhook and Jenkins
-- GitHub push delivery returned HTTP `200`.
-- `Webhook-Test` ran automatically following a GitHub push.
-- Jenkins service logs confirmed a GitHub push event and automatic
-  triggering of `Testing #48`.
-- Build `#48` XML recorded `GitHubPushCause`; the build completed with
-  `SUCCESS`.
+**ECR repository:**
 
-### Ansible
-- Tracked playbooks: `ansible/playbooks/system_info.yml`,
-  `ansible/playbooks/docker_health.yml`, and `ansible/playbooks/disk_check.yml`.
-- Jenkins job `Ansible-Health-Check` completed with `SUCCESS`.
-- Docker service was active and the remote Flask health endpoint was healthy.
-- Disk validation passed below the configured 80% root filesystem threshold.
-- Jenkins `Testing` build `#48` completed with `SUCCESS` on 2026-10-24.
-- The `Ansible Post-Deployment Validation` stage ran
-  `docker_health.yml` and `disk_check.yml`.
-- The build log confirmed `ANSIBLE POST-DEPLOYMENT VALIDATION PASSED`.
+```text
+351083991382.dkr.ecr.ap-south-1.amazonaws.com/devops-flask-api
+```
 
-### EKS, Kubernetes, and ALB — 2026-10-24
-- Initial EKS deployment and ALB endpoint validation succeeded.
-- That test environment was subsequently cleaned up.
+Images use Jenkins build numbers as version tags.
 
-### EKS, Kubernetes, and ALB — 2026-10-26
-- Deployment `devops-flask-api`: 2/2 replicas available, image tag `49`.
-- Both application pods were `Running`, ready, and had zero restarts.
-- Both ALB target group targets reported `Healthy`.
-- `/health` and `/api/users` through the ALB returned `HTTP/1.1 200 OK`.
-- Twenty repeated ALB `/health` requests returned HTTP 200.
-- Direct `/health` requests to both pods returned HTTP 200.
-- The current ALB and EKS application environment are active.
-- Tracked `k8s/deployment.yaml` still references image tag `27`.
-- No Terraform apply or destroy was performed for this validation.
+Example:
 
-### Monitoring — 2026-10-26
-- The four configured Prometheus production rules were present with
-  `health: ok`: `NodeExporterDown`, `HighCPUUsage`, `HighMemoryUsage`,
-  and `LowDiskSpace`.
-- The temporary `PrometheusGmailFiringTest` rule using `vector(1)` passed
-  `promtool` validation, and Prometheus reloaded the configuration.
-- Alertmanager received the test alert and routed it to
-  `gmail-notifications`.
-- Gmail delivery was verified for both `[FIRING:1] PrometheusGmailFiringTest
-  (warning)` and `[RESOLVED] PrometheusGmailFiringTest (warning)`.
-- The temporary test rule was removed, Prometheus was reloaded, and the
-  rules API subsequently showed only the four production rules.
-- This verifies the Prometheus-to-Alertmanager-to-Gmail notification path.
-  Individual real CPU, memory, disk, and Node Exporter failure scenarios
-  have not been demonstrated by this temporary test.
-- Recheck current monitoring host availability and Grafana dashboard
-  functionality before claiming they are currently operational.
+```text
+351083991382.dkr.ecr.ap-south-1.amazonaws.com/devops-flask-api:<BUILD_NUMBER>
+```
 
-## 14. Remaining Work
+The Docker image uses a non-root application user with UID `10001`.
 
-- Apply the reviewed Terraform destroy plan after explicit confirmation,
-  if the EKS lab is no longer needed for a live demonstration.
-- Verify remaining AWS billable resources after cleanup, including NAT
-  Gateways, Elastic IPs, EKS resources, and unattached storage.
-- Perform and document a controlled automated rollback test; rollback
-  logic is implemented, but failure-triggered recovery has not yet been
-  demonstrated by build `#48`.
-- Recheck current Prometheus, Alertmanager, and Grafana availability;
-  validate individual production alert scenarios when practical.
-- Decide whether to retain or clean up the provisioned EKS/VPC/NAT
-  infrastructure after reviewing cost and demo requirements.
-- Retain final CI/CD, EKS/ALB, Terraform validation, and monitoring evidence.
-- Reconcile monitoring documentation with the current running state.
+### Operational checks
 
-## 15. Cost Management
+Check Docker service status:
 
-Stop or destroy lab resources that are not needed.
-Review NAT Gateways, load balancers, EKS node groups, EC2 instances,
-EBS volumes, Elastic IPs, and CloudWatch log groups before cleanup.
+```bash
+sudo systemctl status docker
+```
 
-Preserve required Terraform state and project artifacts.
+List running containers:
+
+```bash
+sudo docker ps
+```
+
+Inspect container configuration:
+
+```bash
+sudo docker inspect <container-name>
+```
+
+Check the application endpoint from the Docker server:
+
+```bash
+curl -fsS http://127.0.0.1:9090/health
+```
+
+The port above reflects the documented Docker host mapping. Confirm the current container port mapping before reusing this command in another environment.
+
+### Image lifecycle
+
+The deployment pipeline publishes a versioned image and preserves the previously deployed container or image for recovery attempts. Old images and rollback containers should be reviewed before cleanup so that a required recovery artifact is not removed prematurely.
+
+## 9. Ansible Validation
+
+Ansible is used to validate the remote Docker application server after deployment.
+
+The documented Ansible environment includes:
+
+- Ansible Core 2.15.3.
+- Python 3.9.25 on the Ansible controller.
+- Inventory group `docker_servers`.
+- Inventory host `app-server`.
+- SSH access as `ec2-user`.
+
+### Playbooks
+
+| Playbook | Purpose |
+|---|---|
+| `system_info.yml` | Collect system information |
+| `docker_health.yml` | Validate Docker service and application health |
+| `disk_check.yml` | Check disk usage and fail at or above the configured 80% threshold |
+
+The Ansible configuration uses host-key checking and disables retry-file generation. SSH options include `IdentitiesOnly=yes`.
+
+### Validation performed
+
+The dedicated `Ansible-Health-Check` Jenkins job validated connectivity, playbook syntax, Docker health, and disk usage against the application server.
+
+The documented run confirmed that the Docker service was active, the application health endpoint was healthy, and the disk-usage check passed.
+
+### Security considerations
+
+- Keep the private SSH key outside the Git repository.
+- Restrict key permissions and access.
+- Use inventory-specific SSH configuration.
+- Do not disable SSH host-key checking in production without a documented security decision.
+
+## 10. Kubernetes and Amazon EKS
+
+The project includes Kubernetes manifests for deployment, service, and ALB ingress configuration.
+
+The documented EKS environment used:
+
+```text
+Cluster: devops-capstone-eks
+Namespace: devops-capstone
+Replicas: 2
+```
+
+### Deployment configuration
+
+The application manifests include security and reliability settings such as:
+
+- Non-root execution.
+- Disabled privilege escalation.
+- Dropped Linux capabilities.
+- Resource requests and limits.
+- Liveness and readiness probes.
+- Two application replicas.
+
+### ALB integration
+
+The ingress configuration integrates the application with an AWS Application Load Balancer.
+
+The documented validation on October 26, 2026, recorded:
+
+- EKS cluster and managed node group active.
+- Two application replicas ready.
+- Two healthy ALB targets.
+- `/health` and `/api/users` returning HTTP 200.
+- Twenty health requests returning successful responses.
+- Direct pod health checks succeeding.
+
+### Image version discrepancy
+
+The tracked Kubernetes manifest uses image tag `27`, while the documented live EKS deployment used tag `49`.
+
+This difference must be reconciled before treating the tracked manifests as a reproducible definition of the live deployment. Do not assume that the Git repository currently reproduces the live image version without updating and reviewing the manifest.
+
+### Cost warning
+
+The EKS lab, node group, load balancer, NAT Gateway, and supporting infrastructure may incur charges while provisioned. Check actual AWS resource status before leaving the environment running or starting cleanup.
+
+## 11. Terraform Infrastructure
+
+Terraform configuration is stored on the Jenkins controller at:
+
+```text
+/var/lib/jenkins/terraform-eks-capstone
+```
+
+It manages infrastructure such as:
+
+- VPC and networking.
+- EKS cluster.
+- Managed node group.
+- IAM roles and associated outputs.
+
+Terraform state, saved plans, and working data are maintained separately from the tracked application repository.
+
+### Plan history
+
+A saved `cleanup-review.tfplan` from October 24, 2026, proposed destroying 24 Terraform-managed resources with zero additions and zero changes. It is a historical plan and must not be treated as a current destroy plan.
+
+A separate `cost-audit-current.tfplan` was generated on October 27, 2026. The documented refresh plan reported no changes between Terraform configuration/state and the refreshed infrastructure view.
+
+A no-change refresh plan does **not** mean the infrastructure is free of charges, nor does it authorize destroying resources.
+
+### Safe cleanup procedure
+
+Before cleanup:
+
+1. Confirm whether the EKS lab is still needed.
+2. Inspect the current Terraform workspace and backend.
+3. Refresh the infrastructure view.
+4. Generate a new destroy plan if cleanup is intended.
+5. Review every resource in that plan.
+6. Confirm the plan does not include the remote state bucket or unrelated resources.
+7. Obtain explicit approval before applying the destroy plan.
+8. Verify remaining billable AWS resources afterward.
+
+Never apply an old saved destroy plan merely because it exists.
+
+## 12. Prometheus, Alertmanager and Gmail
+
+Monitoring validation covered Prometheus alert rules, Alertmanager configuration, and Gmail notifications.
+
+### Production alert rules
+
+The documented production rules are:
+
+| Rule | Intended purpose |
+|---|---|
+| `NodeExporterDown` | Detect unavailable Node Exporter targets |
+| `HighCPUUsage` | Detect high CPU utilization |
+| `HighMemoryUsage` | Detect high memory utilization |
+| `LowDiskSpace` | Detect low available disk space |
+
+The precise expressions, thresholds, and evaluation durations should be reviewed in the actual Prometheus rule configuration.
+
+### Validation performed
+
+On October 26, 2026, the documented checks included:
+
+- `promtool check rules` reported success for four production rules.
+- A synthetic `promtool test rules` suite passed for all four rules.
+- The tests exercised synthetic metric values and firing delays.
+- A temporary test rule was used to exercise the Prometheus-to-Alertmanager-to-Gmail path.
+- Gmail firing and resolved notifications were received.
+- The temporary test rule was removed.
+- Prometheus was reloaded, and the rules API subsequently showed only the four production rules.
+- The production rules file checksum was recorded as:
+
+```text
+5d8b7e40f6ba2f87315b9ed5918bf07187298c0be127ea76b757575a60a81974
+```
+
+### Limitations
+
+Synthetic tests validate rule expressions and expected behavior against test metrics. They do not demonstrate that every production alert has fired due to a real host failure or that each individual production rule has delivered a Gmail notification.
+
+Current Prometheus, Alertmanager, and Grafana availability must be checked again before claiming that the monitoring stack is currently operational.
+
+Do not commit SMTP passwords, Gmail app passwords, tokens, or other credentials to GitHub.
+
+## 13. Deployment Recovery and Rollback Testing
+
+The project includes deployment recovery logic intended to preserve the previous application container and attempt recovery when candidate deployment or production health checks fail.
+
+### Failure-path mock tests — October 26, 2026
+
+The extracted deployment shell script was checked with `bash -n`; the documented extracted script contained 140 lines and passed syntax validation.
+
+Three isolated mock scenarios were tested:
+
+1. A new production container failed to start, causing the script to attempt starting the previous rollback container.
+2. The candidate health check passed, but the production health check failed; rollback was attempted and its mocked health check passed.
+3. Both production and rollback health checks failed, resulting in critical recovery messages and a non-zero exit status.
+
+A subsequent read-only SSH check recorded production image `:51` running and `/health` returning a healthy response.
+
+### Supplementary recovery-branch mocks — October 27, 2026
+
+Three further isolated mock scenarios covered:
+
+- Missing rollback and original production containers after a container rename.
+- Missing rollback container while the original production container was present, running, and healthy.
+- Missing rollback container while the original production container was stopped, followed by a mocked start and successful running-state and application-health checks.
+
+The mocks exercised the relevant recovery branches and expected error handling.
+
+### What is and is not verified
+
+**Verified in the documented tests:**
+
+- Shell syntax validation for the extracted script.
+- Mocked failure-path command flow.
+- Mocked recovery-branch handling.
+- Non-zero exit behavior for failed deployment scenarios.
+
+**Not yet verified by these mock tests:**
+
+- Real Docker state transitions during an actual failed production deployment.
+- Actual rollback recovery in the running production environment.
+- Restored-container health under real failure conditions.
+- Recovery of application traffic after a production switch or failure.
+
+Docker was also reported to have no native health check configured for the production container; application health was checked separately through `/health`.
+
+Mock tests are useful evidence, but they are not a substitute for a controlled real rollback test.
+
+## 14. Validation Evidence
+
+The following table summarizes the documented evidence and its scope.
+
+| Component | Documented evidence | Scope or limitation |
+|---|---|---|
+| Flask application | Three pytest tests passed | Covers the listed application tests |
+| GitHub webhook | Successful push delivery and automatic job triggers | Build `#48` recorded as successful |
+| Jenkins CI/CD | Successful build and deployment evidence | Recheck latest build before claiming current status |
+| Docker/ECR | Versioned images and healthy application endpoint | Check current image and container state |
+| Ansible | Dedicated Jenkins job passed connectivity and health/disk validation | Applies to the tested Docker server |
+| EKS/ALB | Two replicas, two healthy targets, HTTP 200 endpoints | Historical validation; recheck current state |
+| Prometheus rules | Four production rules passed rule checks and synthetic tests | Does not establish real host-failure behavior |
+| Gmail notifications | Firing and resolved test notifications received | Does not prove each production alert's live delivery |
+| Rollback | Six isolated mock scenarios across failure and recovery branches | Real rollback and traffic recovery remain unverified |
+| Terraform | October 27 refresh plan reported no changes | Does not prove zero AWS charges |
+| Cost review | Cost Explorer audit was reviewed | Actual savings from cleanup or optimization must be established separately |
+
+Keep dated build logs, test output, screenshots, and command output as supporting evidence. Remove credentials and sensitive infrastructure details before sharing logs publicly.
+
+## 15. Security Practices
+
+Security controls and practices documented in the project include:
+
+- Run the application container as a non-root user.
+- Use Kubernetes security settings that restrict privilege escalation and drop capabilities.
+- Store secrets in Jenkins credentials or appropriate secret-management systems.
+- Do not commit private keys, passwords, SMTP credentials, tokens, or cloud credentials.
+- Restrict SSH access to trusted sources.
+- Use least-privilege IAM permissions.
+- Preserve SSH host-key verification.
+- Restrict access to the Jenkins UI and administrative interfaces.
+- Review Terraform plans before infrastructure changes.
+- Keep Terraform state and saved plans out of public source control unless explicitly reviewed and approved.
+- Review logs before publishing them because they may contain internal addresses, account identifiers, or other sensitive details.
+
+## 16. Cost Management
+
+AWS resources used by this project may incur charges even when no new application deployment is running.
+
+Resources to review include:
+
+- EC2 instances.
+- EKS cluster and worker nodes.
+- Application Load Balancers.
+- NAT Gateways and associated data processing.
+- EBS volumes and snapshots.
+- Elastic IP addresses.
+- CloudWatch log groups and ingestion.
+- Other provisioned networking and monitoring resources.
+
+### Cost audit findings
+
+The October 2026 Cost Explorer review recorded an estimated total of approximately **$51.95 for October 1–26, including $7.92 in tax**.
+
+The recorded service breakdown was:
+
+| Service category | Approximate recorded cost |
+|---|---:|
+| EC2 Compute | $20.04 |
+| Elastic Load Balancing | $8.58 |
+| Amazon EKS | $5.97 |
+| EC2 Other | $5.94 |
+| Amazon VPC | $3.49 |
+| Amazon ECR | $0.003 |
+| Amazon S3 | $0.0007 |
+
+These are historical estimated figures from the documented audit, not a current invoice or a forecast of future charges. The listed categories may not sum exactly to the total because of rounding, taxes, and other billing details.
+
+### Cost optimization procedure
+
+1. Identify which resources are still required for project demonstrations.
+2. Inspect current AWS resources and Cost Explorer.
+3. Check for unnecessary NAT Gateways, load balancers, EC2 instances, EKS node groups, unattached volumes, and unused Elastic IPs.
+4. Generate and review a fresh Terraform plan if Terraform-managed infrastructure is to be removed.
+5. Obtain explicit confirmation before destructive operations.
+6. Preserve required Terraform state and project evidence.
+7. Verify resource deletion and remaining billable resources.
+8. Recheck Cost Explorer after billing data updates.
+
+The cost audit has been documented, but do not claim a specific cost saving unless the resource changes and resulting billing impact have been verified.
+
+## 17. Current Project Status
+
+Based on the recorded findings, the project has evidence for:
+
+- Flask API and unit tests.
+- GitHub webhook integration.
+- Jenkins CI/CD and Docker/ECR publishing.
+- Remote Docker deployment and health checks.
+- Ansible post-deployment validation.
+- Historical EKS/ALB deployment validation.
+- Prometheus production rule checks and synthetic tests.
+- Gmail firing and resolved test notifications.
+- Isolated rollback failure-path and recovery-branch mocks.
+- Terraform refresh planning and cost review.
+
+The following distinctions remain important:
+
+- Historical deployment success does not establish current infrastructure availability.
+- Synthetic alert tests do not prove real host-failure detection or per-alert email delivery.
+- Mock rollback tests do not establish real Docker rollback or traffic recovery.
+- A no-change Terraform plan does not establish that AWS resources have no ongoing cost.
+- A completed cost audit does not, by itself, demonstrate actual savings.
 
 
-Done
+## 18. Troubleshooting
+
+### Application health check fails
+
+Check the container and logs:
+
+```bash
+sudo docker ps
+sudo docker logs <container-name>
+curl -i http://127.0.0.1:9090/health
+```
+
+Confirm the port mapping, application process, and environment configuration.
+
+### Jenkins deployment fails
+
+Review the console output for the failing stage. Check Git checkout, test results, ECR authentication, image push, SSH access, candidate health checks, and production health checks.
+
+Do not rerun a failed production deployment repeatedly without reviewing the current container state and available recovery artifacts.
+
+### Ansible connectivity fails
+
+Verify the inventory, SSH user, private-key permissions, network access, and SSH host-key configuration. Test connectivity before running the validation playbooks.
+
+### EKS application is unavailable
+
+Inspect cluster and deployment state using the appropriate AWS credentials and Kubernetes context. Check pod readiness, events, service endpoints, ingress configuration, ALB target health, and security-group rules.
+
+### Prometheus alerts or Gmail notifications fail
+
+Validate the Prometheus rules and Alertmanager configuration. Check target availability, rule evaluation, alert routing, SMTP connectivity, and sanitized service logs. Never expose email credentials in command output or GitHub.
+
+### Terraform plan differs from expectations
+
+Confirm the working directory, workspace, backend, state, and AWS credentials. Refresh and review the plan before making changes. Never use an old destroy plan as a substitute for a current review.
+
+---
+
+## Project Repository
+
+GitHub: https://github.com/Ayushgautam2007/Devops-Project
+
+**Documentation principle:** Report what was tested, retain the supporting evidence, distinguish historical results from current state, and clearly identify any unverified behavior.
