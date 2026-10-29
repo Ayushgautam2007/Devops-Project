@@ -31,9 +31,7 @@ An end-to-end DevOps capstone project demonstrating automated testing, container
 17. [Security Best Practices](#17-security-best-practices)
 18. [Cost Management](#18-cost-management)
 19. [Repository Structure](#19-repository-structure)
-20. [Documentation and Screenshots](#20-documentation-and-screenshots)
-21. [Future Improvements](#21-future-improvements)
-22. [Conclusion](#22-conclusion)
+20. [Conclusion](#22-conclusion)
 
 ---
 
