@@ -91,69 +91,7 @@ The main objectives are:
 
 ---
 
-## 4. Architecture Diagrams
-
-This section contains architecture diagrams for the major components of the capstone.
-
-**Important:** The following image links use the filenames listed in the repository root. They will work while the images remain in that location. If you move an image into a subfolder, update its relative path accordingly.
-
-### 4.1 Overall End-to-End DevOps Architecture
-
-The overall architecture shows the flow from source code to CI/CD, container image publishing, cloud infrastructure, Kubernetes deployment, and monitoring.
-
-![Overall End-to-End DevOps Architecture](<Final Capstone AWS DevOps Architecture.png>)
-
-### 4.2 AWS Resources Architecture
-
-The AWS architecture covers the cloud networking and resource design used by the project, including VPC, subnets, IAM, EKS, ECR, and load balancing.
-
-![AWS Resources Architecture](docs/capstone-documentation/AWS-Resources/AWS-Resources-Architecture.png)
-
-### 4.3 Docker, ECR and Ansible Architecture
-
-This architecture covers container image creation, ECR publishing, deployment to the Docker application host, and post-deployment validation using Ansible.
-
-![Docker, ECR and Ansible Architecture](docs/capstone-documentation/Docker-ECR-Ansible/Docker-ECR-Ansible-Architecture.png)
-
-### 4.4 Jenkins CI/CD Architecture
-
-The Jenkins pipeline automates source checkout, testing, Docker image creation, image publishing, deployment, health checks, and recovery handling.
-
-![Jenkins CI/CD Architecture](<Jenkins CI_CD Architecture for EKS.png>)
-
-### 4.5 Amazon EKS, Kubernetes and ALB Architecture
-
-This diagram shows how the application is exposed through a load balancer and served by Kubernetes workloads running on Amazon EKS.
-
-![EKS Kubernetes ALB Architecture](<AWS EKS Kubernetes ALB Architecture Diagram.png>)
-
-### 4.6 Terraform Infrastructure Architecture
-
-Terraform defines and provisions AWS infrastructure, including networking, EKS, IAM, and supporting resources.
-
-![Terraform AWS Infrastructure Architecture](<Terraform AWS Infrastructure Architecture.png>)
-
-### 4.7 Monitoring and Alerts Architecture
-
-The monitoring design includes Prometheus, Node Exporter, Grafana, alert rules, and Alertmanager notification routing.
-
-![Kubernetes Monitoring and Alerts Architecture](<Kubernetes Monitoring & Alerts Architecture.png>)
-
-### 4.8 Rollback and Recovery Architecture
-
-The recovery architecture illustrates application version preservation, rollback procedures, and infrastructure recovery strategies.
-
-![Rollback and Recovery Architecture](<Rollback and Recovery Architecture Infographic.png>)
-
-### 4.9 Final Capstone Architecture and Deployment Flow
-
-The final architecture combines application development, CI/CD, AWS infrastructure, containerization, Kubernetes deployment, monitoring, and recovery planning.
-
-![Final Capstone Architecture](<Final Capstone AWS DevOps Architecture.png>)
-
----
-
-## 5. End-to-End Architecture and Workflow
+## 4. End-to-End Architecture and Workflow
 
 The application delivery process follows this workflow:
 
@@ -248,7 +186,7 @@ The exact execution order depends on the stages implemented in the current Jenki
 
 ---
 
-## 6. Technology Stack
+## 5. Technology Stack
 
 | Area | Technology |
 |---|---|
@@ -270,7 +208,7 @@ The exact execution order depends on the stages implemented in the current Jenki
 
 ---
 
-## 7. Application API
+## 6. Application API
 
 The project uses a Flask REST API.
 
@@ -307,7 +245,7 @@ The documented Docker image uses Python 3.12 slim, Gunicorn on container port `8
 
 ---
 
-## 8. Jenkins CI/CD Pipeline
+## 7. Jenkins CI/CD Pipeline
 
 Jenkins automates application delivery and deployment validation.
 
@@ -364,7 +302,7 @@ A successful webhook HTTP response alone does not prove that the intended Jenkin
 
 ---
 
-## 9. Docker and Amazon ECR
+## 8. Docker and Amazon ECR
 
 Docker packages the application and its runtime dependencies into a container image. Amazon ECR stores images for deployment.
 
@@ -434,7 +372,7 @@ A tag does not guarantee unique image contents. Compare image digests to verify 
 
 ---
 
-## 10. Ansible Validation
+## 9. Ansible Validation
 
 Ansible performs post-deployment validation on the Docker application host.
 
@@ -467,7 +405,7 @@ A successful Ansible run indicates that the tasks completed without failed or un
 
 ---
 
-## 11. Terraform Infrastructure
+## 10. Terraform Infrastructure
 
 Terraform is used to manage the AWS infrastructure as code.
 
@@ -524,7 +462,7 @@ Review the plan before applying changes.
 
 ---
 
-## 12. Amazon EKS and Kubernetes
+## 11. Amazon EKS and Kubernetes
 
 The documented Kubernetes namespace is:
 
@@ -620,7 +558,7 @@ Replace `YOUR-ALB-HOSTNAME` with the real hostname shown by Kubernetes.
 
 ---
 
-## 13. Monitoring and Alerting
+## 12. Monitoring and Alerting
 
 The monitoring stack includes Prometheus, Node Exporter, Grafana, and Alertmanager.
 
@@ -680,7 +618,7 @@ Verify the following in your environment:
 
 ---
 
-## 14. Rollback and Recovery
+## 13. Rollback and Recovery
 
 The Jenkins pipeline contains recovery logic intended to preserve the previous production container and restore it if deployment validation fails.
 
@@ -732,9 +670,9 @@ Database recovery, infrastructure recreation, and cross-region disaster recovery
 
 ---
 
-## 15. Challenges and Solutions
+## 14. Challenges and Solutions
 
-### 15.1 Jenkins Docker Deployment Command Failure
+### 14.1 Jenkins Docker Deployment Command Failure
 
 **Challenge:** A deployment attempt failed because `docker run` did not receive a required argument, even though the image pull succeeded.
 
@@ -742,7 +680,7 @@ Database recovery, infrastructure recreation, and cross-region disaster recovery
 
 **Lesson:** Validate required variables and command arguments before launching the container. A successful image pull alone does not prove successful deployment.
 
-### 15.2 GitHub Webhook Trigger Verification
+### 14.2 GitHub Webhook Trigger Verification
 
 **Challenge:** Successful webhook delivery did not, by itself, prove that the intended Jenkins pipeline was triggered.
 
@@ -752,7 +690,7 @@ Database recovery, infrastructure recreation, and cross-region disaster recovery
 
 **Lesson:** Verify webhook delivery, job configuration, and build cause independently.
 
-### 15.3 Docker-Host and EKS Image-Version Difference
+### 14.3 Docker-Host and EKS Image-Version Difference
 
 **Challenge:** Build #54 used image tag `54` on the Docker application host, while the recorded EKS Deployment used tag `49`.
 
@@ -760,25 +698,25 @@ Database recovery, infrastructure recreation, and cross-region disaster recovery
 
 **Lesson:** A successful Docker-host deployment does not prove that EKS has been updated.
 
-### 15.4 ECR Tag and Digest Traceability
+### 14.4 ECR Tag and Digest Traceability
 
 **Challenge:** Multiple image tags were observed with the same image digest.
 
 **Lesson:** Record image tags and digests to trace deployments to their actual image contents.
 
-### 15.5 Terraform State Versus Live AWS Status
+### 14.5 Terraform State Versus Live AWS Status
 
 **Challenge:** Terraform state alone does not establish current resource health.
 
 **Lesson:** Compare Terraform configuration and state with direct AWS resource status checks.
 
-### 15.6 AWS Resource Cost Awareness
+### 14.6 AWS Resource Cost Awareness
 
 **Challenge:** EKS worker nodes, NAT Gateways, ALBs, and Elastic IP allocations may incur ongoing charges.
 
 **Lesson:** Review active resources and dependencies before changing or deleting infrastructure.
 
-### 15.7 Monitoring Configuration Versus Notification Delivery
+### 14.7 Monitoring Configuration Versus Notification Delivery
 
 **Challenge:** A configured alert rule and email receiver do not prove that an alert fired or an email was received.
 
@@ -786,7 +724,7 @@ Database recovery, infrastructure recreation, and cross-region disaster recovery
 
 ---
 
-## 16. Validation Results
+## 15. Validation Results
 
 The following results were recorded during the documented inspection period.
 
@@ -814,7 +752,7 @@ For final submission, update this table only after repeating the relevant checks
 
 ---
 
-## 17. Security Best Practices
+## 16. Security Best Practices
 
 - Never commit AWS access keys, passwords, private keys, SMTP app passwords, or access tokens.
 - Prefer IAM roles and least-privilege permissions.
@@ -831,7 +769,7 @@ For final submission, update this table only after repeating the relevant checks
 
 Before publishing the repository, inspect the complete commit history for credentials or secrets.
 
-## 18. Cost Management
+## 17. Cost Management
 
 AWS resources can continue to incur charges even when application development has stopped.
 
@@ -857,7 +795,7 @@ Potential cost-generating resources include:
 
 Do not run `terraform destroy` without reviewing the plan and understanding the consequences.
 
-## 19. Repository Structure
+## 18. Repository Structure
 
 The following structure represents the documented repository and the intended organization of its supporting documentation. Verify each file against the current GitHub repository.
 
@@ -911,7 +849,7 @@ The README uses these existing filenames for its architecture images. Move them 
 
 ---
 
-## 20. Documentation and Screenshots
+## 19. Documentation and Screenshots
 
 The project documentation is organized by topic:
 
@@ -968,7 +906,7 @@ Redact credentials, tokens, private keys, SMTP app passwords, and sensitive infr
 
 ---
 
-## 21. Future Improvements
+## 20. Future Improvements
 
 Potential improvements for future iterations include:
 
@@ -988,7 +926,7 @@ Potential improvements for future iterations include:
 
 These improvements should be marked as completed only when implemented and supported by evidence.
 
-## 22. Conclusion
+## 21. Conclusion
 
 This capstone demonstrates a practical DevOps workflow spanning source control, automated testing, containerization, image publishing, deployment validation, infrastructure as code, Kubernetes orchestration, monitoring, and recovery planning.
 
