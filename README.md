@@ -906,27 +906,8 @@ Redact credentials, tokens, private keys, SMTP app passwords, and sensitive infr
 
 ---
 
-## 20. Future Improvements
 
-Potential improvements for future iterations include:
-
-- Stronger automated code-quality checks.
-- Automated image vulnerability scanning and security gates.
-- Image digest-based release traceability.
-- A unified CI/CD workflow for the EKS deployment path.
-- Helm-based deployment management.
-- Tested Kubernetes rollback procedures.
-- End-to-end alert notification tests.
-- Application-level metrics and dashboards.
-- More restrictive IAM and Kubernetes RBAC policies.
-- Automated post-deployment smoke tests.
-- Documented backup and recovery testing.
-- AWS resource inventory and cost monitoring.
-- Automated cleanup of temporary development resources.
-
-These improvements should be marked as completed only when implemented and supported by evidence.
-
-## 21. Conclusion
+## 20. Conclusion
 
 This capstone demonstrates a practical DevOps workflow spanning source control, automated testing, containerization, image publishing, deployment validation, infrastructure as code, Kubernetes orchestration, monitoring, and recovery planning.
 
