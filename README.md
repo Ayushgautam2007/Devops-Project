@@ -107,13 +107,13 @@ The overall architecture shows the flow from source code to CI/CD, container ima
 
 The AWS architecture covers the cloud networking and resource design used by the project, including VPC, subnets, IAM, EKS, ECR, and load balancing.
 
-![AWS Resources Architecture](<AWS Resources Architecture.png>)
+![AWS Resources Architecture](docs/capstone-documentation/AWS-Resources/AWS-Resources-Architecture.png)
 
 ### 4.3 Docker, ECR and Ansible Architecture
 
 This architecture covers container image creation, ECR publishing, deployment to the Docker application host, and post-deployment validation using Ansible.
 
-![Docker, ECR and Ansible Architecture](<Docker ECR Ansible Architecture.png>)
+![Docker, ECR and Ansible Architecture](docs/capstone-documentation/Docker-ECR-Ansible/Docker-ECR-Ansible-Architecture.png)
 
 ### 4.4 Jenkins CI/CD Architecture
 
