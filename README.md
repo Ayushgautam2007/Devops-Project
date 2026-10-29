@@ -487,17 +487,6 @@ These folders should be uploaded under the repository's `docs/` directory, or li
 
 Screenshots provide supporting evidence for configurations, build results, health checks, infrastructure state, and monitoring status. Captions should identify what each screenshot proves and the date or build number where relevant. Sensitive information should be redacted before publication.
 
-## Future Improvements
-
-- Add a reproducible, documented failure-injection test for the rollback workflow.
-- Verify the complete GitHub webhook-to-production pipeline on future commits.
-- Align and independently validate image versions across Docker-host and EKS deployment targets.
-- Add a verified end-to-end alert test that confirms notification delivery.
-- Improve image immutability and release traceability using digest-based deployment references.
-- Add automated security and dependency scanning to the CI/CD pipeline.
-- Add documented resource-lifecycle and cost-review procedures.
-- Add a reproducible infrastructure deployment guide with explicit cleanup and cost warnings.
-
 ## Conclusion
 
 This capstone demonstrates a practical DevOps workflow spanning source control, automated testing, containerization, image publishing, deployment validation, infrastructure automation, Kubernetes orchestration, monitoring, and recovery planning.
