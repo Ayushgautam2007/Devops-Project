@@ -1,325 +1,507 @@
-# DevOps Capstone: Flask CI/CD on AWS
+# DevOps Capstone Project — End-to-End CI/CD, AWS, Kubernetes & Monitoring
 
-## 1. Project Overview
+## Project Overview
 
-This project demonstrates an end-to-end DevOps workflow for a Flask API using GitHub, Jenkins, Docker, Amazon ECR, AWS EC2, Kubernetes/EKS, Terraform, Ansible, and Prometheus/Grafana monitoring.
+This project demonstrates an end-to-end DevOps workflow for a containerized Flask REST API. It integrates source-code management, automated testing, container image building, Amazon ECR, Jenkins CI/CD, Docker deployment, Ansible validation, Terraform infrastructure provisioning, Amazon EKS, Kubernetes, AWS Application Load Balancer, Prometheus, Grafana, and Alertmanager.
 
-The CI/CD pipeline checks out application code, runs automated tests, builds and pushes a Docker image to Amazon ECR, deploys the image to a remote Docker host, verifies application health, preserves the previous production container for recovery, and runs Ansible post-deployment validation.
+The objective is to automate application delivery, validate deployments, monitor application infrastructure, and document recovery mechanisms while maintaining visibility into AWS resource usage and operational costs.
 
-The EKS deployment and internet-facing AWS Application Load Balancer (ALB) were validated on 2026-10-24 and 2026-10-26. The live Kubernetes deployment was observed with two available application replicas and two healthy ALB targets. The live deployment used ECR image tag `49`; the tracked Kubernetes deployment manifest still references tag `27`, so this difference remains unresolved.
+**Repository:** [Ayushgautam2007/Devops-Project](https://github.com/Ayushgautam2007/Devops-Project)
 
-The latest verified Jenkins build reviewed for this README is build `#52`, which completed with `SUCCESS` on 2026-10-27. Its metadata records a GitHub push cause. The deployment log confirms candidate and production health checks, preservation of the previous production container as `flask-api-rollback-52`, and successful Ansible post-deployment validation.
+**AWS Region:** `ap-south-1` (Mumbai)
 
-**Cost warning:** EKS, ALB, NAT Gateway, EC2 instances, EBS volumes, Elastic IPs, and monitoring services may incur AWS charges. Review current resources and costs before leaving the lab running.
+## Key Features
 
-## 2. Architecture
+- Automated CI/CD pipeline using Jenkins
+- GitHub push webhook integration
+- Automated Python application tests using pytest
+- Docker image build and publishing to Amazon ECR
+- Container deployment with health-check validation
+- Ansible-based post-deployment checks
+- Terraform configuration for AWS networking and EKS resources
+- Kubernetes Deployment, Service and Ingress
+- AWS Application Load Balancer integration
+- Prometheus metrics collection and alert rules
+- Grafana dashboards for infrastructure monitoring
+- Alertmanager email-routing configuration
+- Jenkins rollback and recovery logic
+- AWS resource inventory and cost-awareness checks
+
+## Architecture
 
 ```text
 Developer
    |
    v
-GitHub repository (main)
+GitHub Repository
    |
-   | GitHub push webhook
+   | Push event / Webhook
    v
-Jenkins job: Testing
+Jenkins CI/CD Pipeline
    |
-   +--> Checkout source
+   +--> Checkout Source Code
+   |
    +--> Run pytest
-   +--> Build and push Docker image to Amazon ECR
-   +--> Deploy to remote Docker application server
-   |      +--> Pull candidate image
-   |      +--> Start candidate and check /health
-   |      +--> Preserve previous production container
-   |      +--> Start new production and check /health
-   +--> Run Ansible post-deployment validation
-          +--> Docker/application health check
-          +--> Root filesystem threshold check
+   |
+   +--> Build Docker Image
+   |
+   +--> Push Image to Amazon ECR
+   |
+   +--> Deploy to Docker Application Server
+   |
+   +--> Validate Deployment Health
+   |
+   +--> Run Ansible Post-Deployment Checks
+   |
+   v
+Application Deployment
 
-Separate Kubernetes path:
-Terraform-managed AWS infrastructure
-   -> Amazon EKS -> Flask API Deployment (2 replicas)
-   -> Kubernetes Service -> AWS Load Balancer Controller -> ALB
+Infrastructure Deployment Path:
+Terraform --> AWS VPC / Networking / EKS
+                         |
+                         v
+                   Kubernetes
+                         |
+                Deployment / Pods
+                         |
+                    Service
+                         |
+                 ALB Ingress
+                         |
+                         v
+                    Flask API
 
-Monitoring path:
-Prometheus + Alertmanager + Grafana
-   -> Metrics, alert rules, and email notification delivery
+Monitoring Path:
+Node Exporter / Prometheus
+             |
+             +--> Alert Rules --> Alertmanager
+             |
+             +--> Grafana Dashboards
 ```
 
-## 3. Application Endpoints
+The Docker-host deployment and the Kubernetes/EKS deployment are separate deployment paths. Their image versions and deployment results should be verified independently.
 
-| Endpoint | Purpose | Expected result |
+## Technology Stack
+
+| Category | Technologies |
+|---|---|
+| Source control | Git, GitHub |
+| CI/CD | Jenkins |
+| Application | Python, Flask, Gunicorn |
+| Testing | pytest |
+| Containers | Docker |
+| Container registry | Amazon ECR |
+| Infrastructure as Code | Terraform |
+| Configuration management | Ansible |
+| Container orchestration | Kubernetes, Amazon EKS |
+| Networking and ingress | AWS VPC, Application Load Balancer, AWS Load Balancer Controller |
+| Monitoring | Prometheus, Node Exporter, Grafana |
+| Alerting | Prometheus alert rules, Alertmanager |
+| Cloud platform | AWS |
+| Operating systems | Amazon Linux 2023 and Linux |
+
+## Application Details
+
+The project contains a Flask REST API with the following endpoints:
+
+| Endpoint | Purpose | Expected response |
 |---|---|---|
-| `/` | Welcome response | JSON message and version |
-| `/health` | Health check | `{"status":"healthy"}` |
-| `/api/users` | Example users API | JSON response containing sample users |
+| `/` | Application welcome endpoint | Welcome message and version |
+| `/health` | Health-check endpoint | `{"status":"healthy"}` |
+| `/api/users` | Sample users API | JSON containing Ayush and DevOps |
 
-The tests in `tests/test_app.py` cover `test_home`, `test_health`, and `test_users`. A previously verified run reported three passing tests.
+Example health-check response:
 
-## 4. Technology Stack
-
-- Python, Flask, Gunicorn, pytest
-- Docker
-- Git, GitHub, GitHub webhooks
-- Jenkins Pipeline
-- Amazon ECR and EC2
-- Amazon EKS and Kubernetes
-- AWS Application Load Balancer and AWS Load Balancer Controller
-- Terraform
-- Ansible
-- Prometheus, Alertmanager, Grafana
-
-## 5. Repository Structure
-
-Key paths verified during project work:
-
-```text
-.
-├── tests/
-│   └── test_app.py
-├── k8s/
-│   ├── deployment.yaml
-│   ├── service.yaml
-│   └── ingress.yaml
-└── ansible/
-    ├── ansible.cfg
-    ├── inventory/
-    │   └── hosts.ini
-    └── playbooks/
-        ├── system_info.yml
-        ├── docker_health.yml
-        └── disk_check.yml
+```json
+{
+  "status": "healthy"
+}
 ```
 
-The Terraform configuration used for the EKS capstone is maintained on the Jenkins host at `/var/lib/jenkins/terraform-eks-capstone`; it is not assumed to be part of the repository tree above.
+Example API response:
 
-## 6. Local Development
-
-From the repository root, create a virtual environment, install dependencies, and run tests:
-
-```bash
-python3 -m venv .venv
-source .venv/bin/activate
-python -m pip install --upgrade pip
-python -m pip install -r requirements.txt
-pytest -v
+```json
+{
+  "users": [
+    {
+      "id": 1,
+      "name": "Ayush"
+    },
+    {
+      "id": 2,
+      "name": "DevOps"
+    }
+  ]
+}
 ```
 
-Use the project's configured application startup method for local development. For a containerized run, follow the Docker instructions below.
+The Docker image uses `python:3.12-slim` and runs the application as a non-root user (`appuser`, UID `10001`). Gunicorn serves the application on container port `8080`.
 
-## 7. Docker
+## Jenkins CI/CD Pipeline
 
-Build a local image:
+The Jenkins pipeline automates the application delivery workflow.
 
-```bash
-docker build -t devops-flask-api:local .
-```
+### Pipeline stages
 
-Run it, mapping host port 8080 to the container's application port:
+1. **Checkout:** Retrieves the source code and pipeline definition from GitHub.
+2. **Automated Tests:** Runs pytest to validate application behavior.
+3. **Build and Push to ECR:** Builds the Docker image and pushes it to Amazon ECR.
+4. **Deploy to Docker Server:** Pulls the selected image and deploys the application container.
+5. **Health Validation:** Verifies that the deployed application responds successfully.
+6. **Ansible Post-Deployment Validation:** Runs infrastructure and Docker health checks on the application server.
+7. **Recovery Handling:** Uses the configured rollback logic if deployment or health validation fails.
 
-```bash
-docker run --rm -d --name flask-api-local -p 8080:8080 devops-flask-api:local
-```
+### Verified Jenkins Build #54
 
-Check health and stop the local container when finished:
+Build #54 completed successfully on October 27, 2026.
 
-```bash
-curl -fsS http://127.0.0.1:8080/health
-docker stop flask-api-local
-```
+| Verification | Result |
+|---|---|
+| Jenkins build result | `SUCCESS` |
+| Automated tests | 3 passed |
+| ECR image tag | `54` |
+| Previous production container | Preserved as `flask-api-rollback-54` |
+| Ansible validation | `ok=6`, `changed=0`, `unreachable=0`, `failed=0` |
+| Pipeline completion | Successful |
 
-The application container uses a non-root user (UID `10001`) according to the project configuration. Confirm the Dockerfile's port and startup command if those settings have changed.
+Build #54 checked out commit `3ff0c70e00fe417f6ad7eeca57540c51946c7ef2`, with commit message `fix(k8s): align deployment image tag with live version`.
 
-## 8. Jenkins CI/CD
+GitHub push-trigger evidence and Jenkins build-cause metadata were also inspected to distinguish webhook-triggered builds from manually started builds.
 
-Primary Jenkins job: `Testing`. Supporting jobs include `Ansible-Health-Check` and `Webhook-Test`.
+## Docker and Amazon ECR
 
-The `Testing` pipeline includes:
+Docker packages the Flask application and its runtime dependencies into a container image.
 
-1. Checkout source from GitHub.
-2. Run automated application tests.
-3. Build and push the Docker image to Amazon ECR.
-4. Deploy to the remote Docker application server.
-5. Run Ansible post-deployment validation.
-
-The deployment workflow checks candidate health before production replacement, preserves the previous production container, and checks the new production container's health. Build `#52` preserved the previous container as `flask-api-rollback-52`.
-
-### GitHub webhook
-
-GitHub push delivery and automatic Jenkins triggering have been verified. Build `#52` metadata contains `com.cloudbees.jenkins.GitHubPushCause` and the build completed successfully.
-
-### Rollback limitation
-
-Preserving a previous container is a recovery prerequisite, but it does not by itself prove failure-triggered rollback restores service. A controlled rollback/recovery test and a post-recovery health check have not yet been demonstrated in the evidence reviewed here.
-
-## 9. Amazon ECR
-
-Image repository:
+The Amazon ECR repository is:
 
 ```text
 351083991382.dkr.ecr.ap-south-1.amazonaws.com/devops-flask-api
 ```
 
-AWS region: `ap-south-1` (Asia Pacific—Mumbai).
+The pipeline uses build-number-based image tags, allowing individual builds to be referenced in deployment and troubleshooting records.
 
-The pipeline publishes build-number tags. Use the tag shown in the relevant successful build log rather than assuming every build number exists or is deployable.
-
-Docker hosts must authenticate to ECR before pulling images. ECR authorization tokens expire; an expired token caused a deployment-stage failure in build `#33`. Ensure deployment logic refreshes authentication before pulling an image.
-
-## 10. Kubernetes
-
-Manifests are stored in `k8s/`:
-
-- `deployment.yaml`
-- `service.yaml`
-- `ingress.yaml`
-
-The Deployment specifies two replicas, non-root execution, resource requests and limits, and readiness/liveness probes.
-
-### EKS validation
-
-EKS and ALB validation succeeded on 2026-10-24 and 2026-10-26. Evidence from 2026-10-26 showed:
-
-- Cluster and managed node group were active.
-- Deployment `devops-flask-api` had 2/2 replicas available.
-- Both application pods were running and ready with zero restarts.
-- Both ALB target group targets were healthy.
-- ALB `/health` and `/api/users` endpoints returned HTTP 200.
-- Twenty repeated ALB `/health` requests returned HTTP 200.
-- Direct `/health` requests to both pods returned HTTP 200.
-
-Verify current cluster status before relying on this as live operational status.
-
-### Known manifest drift
-
-The tracked `k8s/deployment.yaml` references image tag `27`, while the live EKS deployment validated on 2026-10-26 used tag `49`, applied from a temporary manifest. The tracked manifest was not changed during that validation.
-
-This is an unresolved source-of-truth decision. Review the intended deployment version before updating the tracked manifest.
-
-## 11. Terraform
-
-The EKS capstone Terraform configuration is on the Jenkins host at:
+Example image reference:
 
 ```text
-/var/lib/jenkins/terraform-eks-capstone
+351083991382.dkr.ecr.ap-south-1.amazonaws.com/devops-flask-api:54
 ```
 
-It manages infrastructure used by the EKS environment, including VPC networking, subnets, routes, internet/NAT connectivity, IAM roles, the EKS cluster, and the managed node group.
+The repository was configured with image scanning on push enabled, AES-256 encryption, and mutable tags at the time of inspection.
 
-A prior read-only refresh plan reported:
+**Image traceability note:** ECR inspection showed multiple tags associated with the same image digest. Therefore, a tag name alone does not necessarily prove that two deployments are running different image contents. The image digest should also be compared when verifying versions.
+
+## Ansible Configuration and Validation
+
+Ansible is used for post-deployment validation of the Docker application server.
+
+The documented playbooks include:
+
+- `system_info.yml`
+- `docker_health.yml`
+- `disk_check.yml`
+
+The validation workflow checks host connectivity, Docker/application health, and disk utilization. The disk validation playbook is configured to fail when root filesystem usage reaches or exceeds 80%.
+
+The Jenkins Build #54 post-deployment validation completed with:
 
 ```text
-No changes. Your infrastructure matches the configuration.
+ok=6
+changed=0
+unreachable=0
+failed=0
 ```
 
-That result applies only to the configuration and state at the time of the check. Run a fresh plan before making changes.
+This indicates that the recorded Ansible validation completed without failures or unreachable hosts.
 
-### Safe operating procedure
+## Terraform Infrastructure as Code
 
-- Inspect the current workspace and state before planning changes.
-- Run `terraform plan -refresh=true` and review the full plan.
-- Do not run `terraform apply` or `terraform destroy` until the plan, impact, and cost implications have been reviewed and explicitly approved.
-- Protect Terraform state and credentials; never commit secrets or state files containing sensitive values.
-- Verify the backend configuration before claiming remote S3 state and locking are enabled.
+Terraform configuration is maintained separately in the `terraform-eks-capstone` working directory on the Jenkins server.
 
-## 12. Security Notes
+The configuration is split across multiple `.tf` files rather than a single `main.tf`.
 
-- The Flask container runs as a non-root user (UID `10001`).
-- Keep AWS credentials, SSH private keys, Jenkins secrets, and monitoring credentials out of Git.
-- Prefer IAM roles for AWS access on EC2 rather than long-lived access keys.
-- Restrict Jenkins, SSH, Grafana, Prometheus, and Alertmanager access to trusted networks and authorized users.
-- Do not expose monitoring endpoints publicly without appropriate authentication and network controls.
-- Refresh ECR authentication before image pulls; tokens expire.
-- Preserve backups and recovery artifacts until their purpose and retention have been reviewed.
-- Review security groups, IAM permissions, and stored secrets periodically.
+Documented configuration includes:
 
-## 13. Validation Evidence
+- AWS provider and version constraints
+- Remote Terraform state in an encrypted S3 backend
+- VPC and subnet resources
+- Internet Gateway and route tables
+- NAT Gateway and Elastic IP resources
+- EKS cluster and IAM configuration
+- EKS managed node group
+- Input variables and output values
 
-### Docker CI/CD and application
+The S3 backend configuration uses state locking through `use_lockfile = true`.
 
-- Latest verified pipeline build reviewed here: Jenkins build `#52`, completed with `SUCCESS` on 2026-10-27.
-- Build `#52` metadata records a GitHub push cause.
-- Candidate health check passed before production replacement.
-- Previous production container was preserved as `flask-api-rollback-52`.
-- Production health check passed.
-- `Ansible Post-Deployment Validation` completed successfully.
-- Earlier verified application test output reported three passing tests: `test_home`, `test_health`, and `test_users`.
-- Failure-triggered rollback and recovery health-check execution have not yet been demonstrated.
+The EKS configuration enables API, audit, and authenticator control-plane logs. The managed node group is configured with `t3.medium` instances, a 20 GB disk, minimum size 1, desired size 2, and maximum size 2.
 
-### Webhook and Jenkins
+Terraform state output was captured as infrastructure-tracking evidence. A Terraform state listing indicates which resources are recorded in state; it does not, by itself, prove that every resource is currently running in AWS.
 
-- GitHub push delivery returned HTTP 200 in a previously verified webhook test.
-- `Webhook-Test` ran automatically after a GitHub push.
-- Jenkins logs and build metadata confirmed GitHub push triggering.
-- Build `#52` metadata contains `com.cloudbees.jenkins.GitHubPushCause` and the build completed with `SUCCESS`.
+## Amazon EKS and Kubernetes
 
-### Ansible
+The Kubernetes deployment uses the `devops-capstone` namespace.
 
-- Tracked playbooks include `system_info.yml`, `docker_health.yml`, and `disk_check.yml`.
-- The dedicated `Ansible-Health-Check` job completed successfully in earlier validation.
-- Build `#52` reported `ANSIBLE POST-DEPLOYMENT VALIDATION PASSED`.
-- Build `#40`'s disk check reported root filesystem usage of 16%, below the configured 80% threshold, with zero failed or unreachable hosts.
-- Ansible validation checks application health and disk usage; it does not replace a full recovery test.
+The documented Kubernetes resources include:
 
-### EKS, Kubernetes, and ALB — 2026-10-24 and 2026-10-26
+- Deployment: `devops-flask-api`
+- Service: `devops-flask-api`
+- Ingress: `devops-flask-api`
+- Application pods managed by the Deployment
+- AWS Load Balancer Controller integration
 
-- Initial EKS deployment and ALB endpoint validation succeeded.
-- The 2026-10-26 check showed 2/2 application replicas available.
-- Both ALB target group targets reported healthy.
-- ALB `/health` and `/api/users` endpoints returned HTTP 200.
-- Twenty repeated ALB `/health` requests returned HTTP 200.
-- The live deployment used image tag `49`; the tracked manifest still referenced `27`.
-- No Terraform apply or destroy was performed for the 2026-10-26 validation.
-- Recheck the live cluster and ALB before using this as current status.
+The EKS cluster was verified as `ACTIVE`, with Kubernetes version `1.37`. The managed node group `devops-capstone-nodes` was also reported as `ACTIVE`.
 
-### Terraform
+At the time of the recorded checks:
 
-- A prior refresh plan reported no changes between Terraform configuration and infrastructure state at that time.
-- No Terraform apply or destroy was performed during the 2026-10-26 EKS validation.
-- Run a fresh plan before future infrastructure changes.
+- Two worker nodes were in `Ready` state.
+- Two Flask application pods were `Running` and ready.
+- The application Deployment reported 2 desired and 2 available replicas.
+- The Kubernetes Service exposed the application internally.
+- The ALB Ingress provided external HTTP access to the application.
 
-### Monitoring and notifications
+### Application endpoint verification
 
-- Prometheus, Alertmanager, and Grafana health endpoints previously returned successful responses.
-- Prometheus targets and alert rules were checked.
-- A synthetic alert was submitted to Alertmanager, and Gmail notification delivery was confirmed.
-- Current service health and alert auto-clear behavior must be rechecked before claiming monitoring remains active and fully validated.
+The ALB health endpoint returned HTTP 200 with:
 
-## 14. Remaining Work
+```json
+{"status":"healthy"}
+```
 
-- Perform and document a controlled automated rollback/recovery test during an approved maintenance window, including a successful health check after recovery.
-- Recheck Prometheus, Alertmanager, and Grafana health and verify alert auto-clear behavior.
-- Reconcile the tracked Kubernetes manifest image tag (`27`) with the intended deployment version; the live deployment previously used tag `49`.
-- Review remaining AWS billable resources and current costs, including EKS, EC2, ALB, NAT Gateways, Elastic IPs, EBS volumes, and monitoring resources.
-- Decide whether to retain the EKS/VPC/NAT environment for demonstration or clean it up after reviewing the plan and cost impact.
-- Retain final CI/CD, webhook, Ansible, EKS/ALB, Terraform, and monitoring evidence.
-- Confirm the Terraform backend configuration before claiming remote S3 state and locking.
-- Recheck live resource status before describing the environment as currently active.
+The `/api/users` endpoint also returned HTTP 200 with the expected two-user JSON response.
 
-## 15. Cost Management
+### Image-version distinction
 
-AWS lab resources can incur charges even when idle. Pay particular attention to:
+The recorded EKS Deployment used:
 
-- EKS cluster and worker-node compute
-- EC2 instances
-- NAT Gateway hourly and data-processing charges
-- Application Load Balancers
-- EBS volumes and snapshots
-- Elastic IPs and other networking resources
-- CloudWatch logs and metrics
-- Monitoring hosts or storage, if hosted on AWS
+```text
+351083991382.dkr.ecr.ap-south-1.amazonaws.com/devops-flask-api:49
+```
 
-Before cleanup:
+Jenkins Build #54 deployed image tag `54` to the Docker application host. These are separate deployment records and should not be interpreted as proof that EKS was running tag `54`.
 
-1. Inspect the current AWS resource inventory in `ap-south-1`.
-2. Identify each resource's owner and purpose; do not assume all resources belong to this capstone.
-3. Review a Terraform destroy plan and resources managed outside Terraform.
-4. Preserve Jenkins and the Docker application server unless there is explicit approval to remove them.
-5. Obtain explicit approval before executing destructive cleanup commands.
-6. Recheck the resource inventory after any approved cleanup.
+The Kubernetes image tag and application health should be rechecked after any subsequent deployment.
 
-Do not infer that a resource has been deleted simply because it is absent from Terraform state; manually created or separately managed resources may remain.
+## Prometheus, Grafana and Alertmanager
 
----
+The monitoring stack includes Prometheus, Node Exporter, Grafana, and Alertmanager.
 
-**Status note:** This README records evidence reviewed through 2026-10-27. Historical validation is not a guarantee of current service health. Re-run relevant checks before a live demonstration or final submission.
+### Prometheus
+
+Prometheus collects metrics from configured targets. The recorded target checks showed both the Prometheus and Node Exporter targets as `UP`.
+
+The configured alert rules include:
+
+| Alert rule | Condition | Duration | Severity |
+|---|---|---|---|
+| `NodeExporterDown` | Node Exporter target is down | 120 seconds | Critical |
+| `HighCPUUsage` | CPU usage exceeds 80% | 5 minutes | Warning |
+| `HighMemoryUsage` | Memory usage exceeds 85% | 5 minutes | Warning |
+| `LowDiskSpace` | Root filesystem usage exceeds 80% | 5 minutes | Warning |
+
+At the time of the captured Prometheus alert query, no active alerts were returned. This describes the state at that inspection time, not the absence of all historical incidents.
+
+### Grafana
+
+Grafana provides dashboards for infrastructure metrics, including:
+
+- CPU utilization
+- System load
+- Memory usage
+- Root filesystem usage
+- Network activity
+- Historical metric trends
+
+The recorded Grafana health check returned a healthy database status. The configured Prometheus datasource uses the internal endpoint `http://prometheus:9090`.
+
+### Alertmanager
+
+Alertmanager was configured with a receiver named `gmail-notifications` and SMTP email routing. The configuration includes resolved-alert notifications.
+
+The recorded Alertmanager status showed the service as ready. Configuration evidence confirms that an email receiver and routing were configured; it does not independently prove successful email delivery.
+
+Grafana contact points were separately observed to be empty during inspection. Grafana contact-point configuration and Alertmanager SMTP configuration are distinct components.
+
+## Rollback and Recovery Strategy
+
+The Jenkins pipeline contains rollback and recovery logic designed to preserve the previous production container and restore it if a new deployment fails validation.
+
+The documented mechanism includes:
+
+1. Preserve the previous production container using a build-specific rollback name.
+2. Start the new application container.
+3. Validate the candidate deployment using the health endpoint.
+4. If deployment or health validation fails, remove the failed candidate where appropriate.
+5. Restart the preserved rollback container.
+
+For Build #54, the previous production container was recorded as:
+
+```text
+flask-api-rollback-54
+```
+
+The build log confirms successful deployment and rollback-container preservation. The recovery logic was reviewed in the Jenkins pipeline source.
+
+**Testing limitation:** The available evidence confirms successful deployment and the presence of recovery logic. It does not establish that an intentional failed deployment was simulated and an actual rollback was successfully executed.
+
+## Challenges and Solutions
+
+This section documents concrete issues and operational considerations encountered during implementation. Each item should be retained only to the extent supported by the corresponding logs, configuration, or verification evidence.
+
+### 1. Jenkins Docker Deployment Failure
+
+**Challenge:** A Jenkins deployment attempt failed when the `docker run` command did not receive the required argument.
+
+**Investigation:** The deployment stage had successfully pulled the image, but the container launch failed. This isolated the failure to the Docker run command or its variable expansion rather than the image pull itself.
+
+**Resolution approach:** Inspect the generated command, quote image and container variables correctly, and verify that all required Docker arguments are present before launching the container.
+
+**Lesson learned:** A successful image pull does not guarantee a successful container deployment. Pipeline stages should validate commands and fail clearly when required variables are missing.
+
+### 2. GitHub Webhook and Jenkins Trigger Verification
+
+**Challenge:** A successful GitHub webhook delivery did not, on its own, establish that the main `Testing` pipeline had been triggered by the push.
+
+**Investigation:** Webhook delivery responses, the `Testing` job's trigger configuration, and Jenkins build-cause metadata were inspected independently.
+
+**Result:** Webhook-trigger evidence was found for the `Webhook-Test` job. Build #54 metadata also identified a GitHub push cause for the `Testing` job.
+
+**Lesson learned:** Webhook delivery, job trigger configuration, and an individual build's cause are separate pieces of evidence. All three should be checked when troubleshooting CI/CD triggers.
+
+### 3. Kubernetes and Docker-Host Image-Version Difference
+
+**Challenge:** Jenkins Build #54 used image tag `54` for the Docker-host deployment, while the live EKS Deployment was recorded with image tag `49`.
+
+**Investigation:** The EKS Deployment's actual image reference was checked with Kubernetes commands and compared with Jenkins build logs.
+
+**Resolution:** The version difference was documented rather than assuming that a successful Docker-host deployment had also updated EKS. The Kubernetes image tag must be updated through the intended deployment workflow when a new EKS release is required.
+
+**Lesson learned:** CI/CD status for one deployment target does not prove that a separate Kubernetes environment has been updated. Each target requires independent version and health validation.
+
+### 4. ECR Tag and Image-Digest Traceability
+
+**Challenge:** ECR inspection showed multiple image tags associated with the same image digest.
+
+**Investigation:** The repository's image details and digest information were inspected.
+
+**Resolution:** Deployment evidence records both the image tag and digest where available. This helps distinguish a tag label from the actual image content it references.
+
+**Lesson learned:** For reliable image traceability, record immutable digest references in addition to tags.
+
+### 5. Terraform State Versus Live Infrastructure
+
+**Challenge:** A Terraform state listing provides resource-tracking information but cannot independently prove the current operational status of every AWS resource.
+
+**Investigation:** Terraform state evidence was compared with direct AWS status checks for EKS, its node group, the NAT Gateway, and the Application Load Balancer.
+
+**Resolution:** The report separates Terraform configuration/state evidence from live AWS resource status.
+
+**Lesson learned:** Infrastructure as Code records and cloud runtime status should be validated independently.
+
+### 6. AWS Cost and Resource-Lifecycle Management
+
+**Challenge:** EKS worker nodes, NAT Gateways, Application Load Balancers, and Elastic IP allocations can incur ongoing costs.
+
+**Investigation:** AWS resource inventories and status information were collected to identify active resources and their associations.
+
+**Resolution:** Resource status and dependencies should be reviewed before making infrastructure changes. Cleanup should be planned deliberately to avoid breaking dependencies or deleting resources still needed for validation.
+
+**Lesson learned:** Cost awareness is part of DevOps operations. Infrastructure should be monitored and unused resources cleaned up when no longer required.
+
+### 7. Monitoring Configuration Versus Alert Delivery
+
+**Challenge:** Having alert rules and an email receiver configured does not, by itself, prove that an alert was triggered or that an email was delivered.
+
+**Investigation:** Prometheus target status, alert rules, active-alert results, Alertmanager readiness, and Grafana contact points were inspected separately.
+
+**Resolution:** Monitoring status and configuration are documented independently from actual notification-delivery tests.
+
+**Lesson learned:** Validate the complete alert path—from metric condition to alert firing, Alertmanager routing, and receipt of the notification—before claiming end-to-end alert delivery.
+
+## Validation Summary
+
+The following results were captured during the documented inspection period:
+
+| Component | Recorded evidence |
+|---|---|
+| Jenkins Build #54 | `SUCCESS` |
+| Automated tests | 3 passed |
+| Amazon ECR | Image tag `54` and digest inspected |
+| Docker application host | Candidate and production health checks passed |
+| Ansible | `ok=6`, `changed=0`, `unreachable=0`, `failed=0` |
+| EKS cluster | `ACTIVE` |
+| EKS managed node group | `ACTIVE` |
+| Kubernetes worker nodes | 2 nodes `Ready` |
+| Kubernetes application pods | 2 pods `Running` and ready |
+| Application Load Balancer | Active; health and users endpoints returned HTTP 200 |
+| Prometheus targets | Configured targets reported `UP` |
+| Prometheus alerts | No active alerts at the recorded inspection time |
+| Grafana | Health check passed; Prometheus datasource configured |
+| Alertmanager | Reported ready; email receiver configuration inspected |
+| Rollback mechanism | Preserved previous container and recovery logic reviewed |
+
+These results represent recorded checks at the time of inspection. Resource states, application versions, and metrics can change after subsequent deployments or infrastructure modifications.
+
+## Security Considerations
+
+- Do not commit AWS access keys, secret access keys, passwords, SMTP app passwords, private keys, or access tokens.
+- Use IAM roles and least-privilege permissions wherever possible.
+- Avoid publishing unnecessary account identifiers, public IP addresses, private endpoints, and sensitive infrastructure details.
+- Keep application containers running as non-root users where possible.
+- Review Terraform state, Jenkins configuration, and monitoring configuration before making the repository public.
+- Use secure secret storage for credentials rather than embedding secret values in source files.
+- Review ECR tag mutability and image-scanning results as part of the release process.
+
+## Repository Structure
+
+The repository contains the application and its deployment-related files. The following is a conceptual overview; actual file locations should be verified against the current repository.
+
+```text
+Devops-Project/
+├── app.py
+├── Dockerfile
+├── Jenkinsfile
+├── requirements.txt
+├── tests/
+├── ansible/
+├── k8s/
+├── terraform/        # If maintained inside the repository
+├── docs/             # Project documentation and screenshots
+└── README.md
+```
+
+The Terraform working directory used in the documented environment was maintained separately on the Jenkins server. Do not assume that every Terraform file is already committed to the repository.
+
+## Documentation and Screenshots
+
+The project screenshots are organized into the following documentation categories:
+
+- `Architecture/`
+- `Jenkins-CICD/`
+- `Docker-ECR-Ansible/`
+- `EKS-Kubernetes-ALB/`
+- `Terraform/`
+- `Monitoring-Alerts/`
+- `Rollback-Recovery/`
+- `AWS-Resources/`
+
+These folders should be uploaded under the repository's `docs/` directory, or linked from this README after confirming their final paths.
+
+Screenshots provide supporting evidence for configurations, build results, health checks, infrastructure state, and monitoring status. Captions should identify what each screenshot proves and the date or build number where relevant. Sensitive information should be redacted before publication.
+
+## Future Improvements
+
+- Add a reproducible, documented failure-injection test for the rollback workflow.
+- Verify the complete GitHub webhook-to-production pipeline on future commits.
+- Align and independently validate image versions across Docker-host and EKS deployment targets.
+- Add a verified end-to-end alert test that confirms notification delivery.
+- Improve image immutability and release traceability using digest-based deployment references.
+- Add automated security and dependency scanning to the CI/CD pipeline.
+- Add documented resource-lifecycle and cost-review procedures.
+- Add a reproducible infrastructure deployment guide with explicit cleanup and cost warnings.
+
+## Conclusion
+
+This capstone demonstrates a practical DevOps workflow spanning source control, automated testing, containerization, image publishing, deployment validation, infrastructure automation, Kubernetes orchestration, monitoring, and recovery planning.
+
+The recorded Jenkins Build #54 completed successfully with three passing tests and successful Ansible post-deployment validation. The EKS environment and application endpoints were also independently verified during the documented inspection period.
+
+The project highlights an important operational principle: successful delivery requires not only automation, but also independent health checks, version traceability, monitoring validation, recovery planning, and cost-aware infrastructure management.
