@@ -134,55 +134,55 @@ The project demonstrates how application delivery, infrastructure provisioning, 
 
 This diagram illustrates the overall workflow from source code to deployment, including CI/CD, AWS infrastructure, containerization, Kubernetes, and monitoring.
 
-![Overall End-to-End DevOps Architecture](docs/capstone-documentation/Architecture/01-overall-devops-architecture.png)
+![Overall End-to-End DevOps Architecture](docs/capstone-documentation/Architecture/overall-devops-architecture.png)
 
 ### 3.2 AWS Resources Architecture
 
 This diagram illustrates the AWS networking and resource layout, including VPC, subnets, EKS, ECR, load balancing, IAM, and supporting AWS services.
 
-![AWS Resources Architecture](docs/capstone-documentation/AWS-Resources/02-aws-resources-architecture.png)
+![AWS Resources Architecture](docs/capstone-documentation/AWS-Resources/aws-resources-architecture.png)
 
 ### 3.3 Docker, ECR and Ansible Architecture
 
 This diagram illustrates Docker image creation, Amazon ECR image storage, vulnerability scanning, and Ansible-based deployment validation.
 
-![Docker, ECR and Ansible Architecture](docs/capstone-documentation/Docker-ECR-Ansible/03-docker-ecr-ansible-architecture.png)
+![Docker, ECR and Ansible Architecture](docs/capstone-documentation/Docker-ECR-Ansible/docker-ecr-ansible-architecture.png)
 
 ### 3.4 Jenkins CI/CD Architecture
 
 This diagram illustrates the Jenkins pipeline stages, including GitHub checkout, automated testing, Docker build, image scanning, ECR publishing, deployment, and notifications.
 
-![Jenkins CI/CD Architecture](docs/capstone-documentation/Jenkins-CICD/04-jenkins-cicd-architecture.png)
+![Jenkins CI/CD Architecture](docs/capstone-documentation/Jenkins-CICD/jenkins-cicd-architecture.png)
 
 ### 3.5 EKS, Kubernetes and ALB Architecture
 
 This diagram illustrates application access through a load balancer, Kubernetes workloads on EKS, worker nodes, application Pods, and container images from ECR.
 
-![EKS Kubernetes ALB Architecture](docs/capstone-documentation/EKS-Kubernetes-ALB/05-eks-kubernetes-alb-architecture.png)
+![EKS Kubernetes ALB Architecture](docs/capstone-documentation/EKS-Kubernetes-ALB/eks-kubernetes-alb-architecture.png)
 
 ### 3.6 Terraform Infrastructure Architecture
 
 This diagram illustrates infrastructure provisioning through Terraform, including AWS networking, EKS, ECR, IAM, resource outputs, and CI/CD integration.
 
-![Terraform Infrastructure Architecture](docs/capstone-documentation/Terraform/06-terraform-infrastructure-architecture.png)
+![Terraform Infrastructure Architecture](docs/capstone-documentation/Terraform/terraform-infrastructure-architecture.png)
 
 ### 3.7 Monitoring and Alerts Architecture
 
 This diagram illustrates application and infrastructure monitoring using Prometheus, Grafana, Alertmanager, CloudWatch, and notification integrations.
 
-![Monitoring and Alerts Architecture](docs/capstone-documentation/Monitoring-Alerts/07-monitoring-alerts-architecture.png)
+![Monitoring and Alerts Architecture](docs/capstone-documentation/Monitoring-Alerts/monitoring-alerts-architecture.png)
 
 ### 3.8 Rollback and Recovery Architecture
 
 This diagram illustrates application rollback, preservation of previous versions, database recovery strategies, infrastructure recreation, and disaster recovery concepts.
 
-![Rollback and Recovery Architecture](docs/capstone-documentation/Rollback-Recovery/08-rollback-recovery-architecture.png)
+![Rollback and Recovery Architecture](docs/capstone-documentation/Rollback-Recovery/rollback-recovery-architecture.png)
 
 ### 3.9 Final Capstone Architecture and Deployment Flow
 
 This diagram presents the overall capstone solution, combining source control, CI/CD, AWS infrastructure, EKS deployment, monitoring, security, and recovery strategies.
 
-![Final Capstone Architecture and Deployment Flow](docs/capstone-documentation/Architecture/09-final-capstone-architecture.png)
+![Final Capstone Architecture and Deployment Flow](docs/capstone-documentation/Architecture/final-capstone-architecture.png)
 
 > **Architecture note:** These diagrams provide visual documentation of the project design. Optional services and capabilities must be marked as implemented only when their configuration and test evidence are available.
 
