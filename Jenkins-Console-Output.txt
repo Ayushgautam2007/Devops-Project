@@ -1,0 +1,432 @@
+Started by GitHub push by Ayushgautam2007
+Obtained Jenkinsfile from git https://github.com/Ayushgautam2007/Devops-Project.git
+[Pipeline] Start of Pipeline
+[Pipeline] node
+Running on Jenkins in /var/lib/jenkins/workspace/Testing
+[Pipeline] {
+[Pipeline] stage
+[Pipeline] { (Declarative: Checkout SCM)
+[Pipeline] checkout
+Selected Git installation does not exist. Using Default
+The recommended git tool is: NONE
+No credentials specified
+ > /usr/bin/git rev-parse --resolve-git-dir /var/lib/jenkins/workspace/Testing/.git # timeout=10
+Fetching changes from the remote Git repository
+ > /usr/bin/git config remote.origin.url https://github.com/Ayushgautam2007/Devops-Project.git # timeout=10
+Fetching upstream changes from https://github.com/Ayushgautam2007/Devops-Project.git
+ > /usr/bin/git --version # timeout=10
+ > git --version # 'git version 2.50.1'
+ > /usr/bin/git fetch --tags --force --progress -- https://github.com/Ayushgautam2007/Devops-Project.git +refs/heads/*:refs/remotes/origin/* # timeout=10
+ > /usr/bin/git rev-parse refs/remotes/origin/main^{commit} # timeout=10
+Checking out Revision f5718f6c96e1597edb3f9025a696d3b78b54ce27 (refs/remotes/origin/main)
+ > /usr/bin/git config core.sparsecheckout # timeout=10
+ > /usr/bin/git checkout -f f5718f6c96e1597edb3f9025a696d3b78b54ce27 # timeout=10
+Commit message: "README.md"
+ > /usr/bin/git rev-list --no-walk 0412400eb663ac6d744d47267ac0d10b6b6f9876 # timeout=10
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] withEnv
+[Pipeline] {
+[Pipeline] withEnv
+[Pipeline] {
+[Pipeline] timestamps
+[Pipeline] {
+[Pipeline] stage
+[Pipeline] { (Checkout)
+[Pipeline] echo
+[2026-10-29T04:43:29.316Z] Checking out application source from GitHub.
+[Pipeline] git
+[2026-10-29T04:43:29.328Z] Selected Git installation does not exist. Using Default
+[2026-10-29T04:43:29.328Z] The recommended git tool is: NONE
+[2026-10-29T04:43:29.328Z] No credentials specified
+[2026-10-29T04:43:29.328Z]  > /usr/bin/git rev-parse --resolve-git-dir /var/lib/jenkins/workspace/Testing/.git # timeout=10
+[2026-10-29T04:43:29.331Z] Fetching changes from the remote Git repository
+[2026-10-29T04:43:29.332Z]  > /usr/bin/git config remote.origin.url https://github.com/Ayushgautam2007/Devops-Project.git # timeout=10
+[2026-10-29T04:43:29.335Z] Fetching upstream changes from https://github.com/Ayushgautam2007/Devops-Project.git
+[2026-10-29T04:43:29.335Z]  > /usr/bin/git --version # timeout=10
+[2026-10-29T04:43:29.337Z]  > git --version # 'git version 2.50.1'
+[2026-10-29T04:43:29.337Z]  > /usr/bin/git fetch --tags --force --progress -- https://github.com/Ayushgautam2007/Devops-Project.git +refs/heads/*:refs/remotes/origin/* # timeout=10
+[2026-10-29T04:43:29.842Z]  > /usr/bin/git rev-parse refs/remotes/origin/main^{commit} # timeout=10
+[2026-10-29T04:43:29.845Z] Checking out Revision f5718f6c96e1597edb3f9025a696d3b78b54ce27 (refs/remotes/origin/main)
+[2026-10-29T04:43:29.845Z]  > /usr/bin/git config core.sparsecheckout # timeout=10
+[2026-10-29T04:43:29.847Z]  > /usr/bin/git checkout -f f5718f6c96e1597edb3f9025a696d3b78b54ce27 # timeout=10
+[2026-10-29T04:43:29.850Z]  > /usr/bin/git branch -a -v --no-abbrev # timeout=10
+[2026-10-29T04:43:29.853Z]  > /usr/bin/git branch -D main # timeout=10
+[2026-10-29T04:43:29.855Z]  > /usr/bin/git checkout -b main f5718f6c96e1597edb3f9025a696d3b78b54ce27 # timeout=10
+[2026-10-29T04:43:29.859Z] Commit message: "README.md"
+[Pipeline] sh
+[2026-10-29T04:43:30.128Z] + set -eu
+[2026-10-29T04:43:30.128Z] + echo '========== SOURCE REVISION =========='
+[2026-10-29T04:43:30.128Z] ========== SOURCE REVISION ==========
+[2026-10-29T04:43:30.128Z] + git log -1 --oneline
+[2026-10-29T04:43:30.128Z] f5718f6 README.md
+[2026-10-29T04:43:30.128Z] + echo '========== WORKSPACE =========='
+[2026-10-29T04:43:30.128Z] ========== WORKSPACE ==========
+[2026-10-29T04:43:30.128Z] + pwd
+[2026-10-29T04:43:30.128Z] /var/lib/jenkins/workspace/Testing
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] stage
+[Pipeline] { (Automated Tests)
+[Pipeline] sh
+[2026-10-29T04:43:30.449Z] + set -eu
+[2026-10-29T04:43:30.449Z] + echo '========== PYTHON ENVIRONMENT =========='
+[2026-10-29T04:43:30.449Z] ========== PYTHON ENVIRONMENT ==========
+[2026-10-29T04:43:30.449Z] + python3 --version
+[2026-10-29T04:43:30.449Z] Python 3.9.25
+[2026-10-29T04:43:30.449Z] + python3 -m venv .venv
+[2026-10-29T04:43:31.360Z] + . .venv/bin/activate
+[2026-10-29T04:43:31.360Z] ++ deactivate nondestructive
+[2026-10-29T04:43:31.360Z] ++ '[' -n '' ']'
+[2026-10-29T04:43:31.360Z] ++ '[' -n '' ']'
+[2026-10-29T04:43:31.360Z] ++ '[' -n /usr/bin/sh -o -n '' ']'
+[2026-10-29T04:43:31.360Z] ++ hash -r
+[2026-10-29T04:43:31.360Z] ++ '[' -n '' ']'
+[2026-10-29T04:43:31.360Z] ++ unset VIRTUAL_ENV
+[2026-10-29T04:43:31.360Z] ++ '[' '!' nondestructive = nondestructive ']'
+[2026-10-29T04:43:31.360Z] ++ VIRTUAL_ENV=/var/lib/jenkins/workspace/Testing/.venv
+[2026-10-29T04:43:31.360Z] ++ export VIRTUAL_ENV
+[2026-10-29T04:43:31.360Z] ++ _OLD_VIRTUAL_PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin
+[2026-10-29T04:43:31.360Z] ++ PATH=/var/lib/jenkins/workspace/Testing/.venv/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin
+[2026-10-29T04:43:31.360Z] ++ export PATH
+[2026-10-29T04:43:31.360Z] ++ '[' -n '' ']'
+[2026-10-29T04:43:31.360Z] ++ '[' -z '' ']'
+[2026-10-29T04:43:31.360Z] ++ _OLD_VIRTUAL_PS1=
+[2026-10-29T04:43:31.360Z] ++ PS1='(.venv) '
+[2026-10-29T04:43:31.360Z] ++ export PS1
+[2026-10-29T04:43:31.360Z] ++ '[' -n /usr/bin/sh -o -n '' ']'
+[2026-10-29T04:43:31.360Z] ++ hash -r
+[2026-10-29T04:43:31.360Z] + python -m pip install --upgrade pip
+[2026-10-29T04:43:31.611Z] Requirement already satisfied: pip in ./.venv/lib/python3.9/site-packages (26.0.1)
+[2026-10-29T04:43:31.611Z] + python -m pip install -r app/requirements.txt
+[2026-10-29T04:43:31.861Z] Requirement already satisfied: Flask==3.1.2 in ./.venv/lib/python3.9/site-packages (from -r app/requirements.txt (line 1)) (3.1.2)
+[2026-10-29T04:43:31.861Z] Requirement already satisfied: gunicorn in ./.venv/lib/python3.9/site-packages (from -r app/requirements.txt (line 2)) (23.0.0)
+[2026-10-29T04:43:31.861Z] Requirement already satisfied: pytest in ./.venv/lib/python3.9/site-packages (from -r app/requirements.txt (line 3)) (8.4.2)
+[2026-10-29T04:43:31.861Z] Requirement already satisfied: blinker>=1.9.0 in ./.venv/lib/python3.9/site-packages (from Flask==3.1.2->-r app/requirements.txt (line 1)) (1.9.0)
+[2026-10-29T04:43:31.861Z] Requirement already satisfied: click>=8.1.3 in ./.venv/lib/python3.9/site-packages (from Flask==3.1.2->-r app/requirements.txt (line 1)) (8.1.8)
+[2026-10-29T04:43:31.861Z] Requirement already satisfied: importlib-metadata>=3.6.0 in ./.venv/lib/python3.9/site-packages (from Flask==3.1.2->-r app/requirements.txt (line 1)) (8.7.1)
+[2026-10-29T04:43:31.861Z] Requirement already satisfied: itsdangerous>=2.2.0 in ./.venv/lib/python3.9/site-packages (from Flask==3.1.2->-r app/requirements.txt (line 1)) (2.2.0)
+[2026-10-29T04:43:31.861Z] Requirement already satisfied: jinja2>=3.1.2 in ./.venv/lib/python3.9/site-packages (from Flask==3.1.2->-r app/requirements.txt (line 1)) (3.1.6)
+[2026-10-29T04:43:31.861Z] Requirement already satisfied: markupsafe>=2.1.1 in ./.venv/lib/python3.9/site-packages (from Flask==3.1.2->-r app/requirements.txt (line 1)) (3.0.4)
+[2026-10-29T04:43:31.861Z] Requirement already satisfied: werkzeug>=3.1.0 in ./.venv/lib/python3.9/site-packages (from Flask==3.1.2->-r app/requirements.txt (line 1)) (3.1.9)
+[2026-10-29T04:43:31.861Z] Requirement already satisfied: packaging in ./.venv/lib/python3.9/site-packages (from gunicorn->-r app/requirements.txt (line 2)) (26.3)
+[2026-10-29T04:43:31.861Z] Requirement already satisfied: exceptiongroup>=1 in ./.venv/lib/python3.9/site-packages (from pytest->-r app/requirements.txt (line 3)) (1.3.1)
+[2026-10-29T04:43:31.861Z] Requirement already satisfied: iniconfig>=1 in ./.venv/lib/python3.9/site-packages (from pytest->-r app/requirements.txt (line 3)) (2.1.0)
+[2026-10-29T04:43:31.861Z] Requirement already satisfied: pluggy<2,>=1.5 in ./.venv/lib/python3.9/site-packages (from pytest->-r app/requirements.txt (line 3)) (1.6.0)
+[2026-10-29T04:43:31.861Z] Requirement already satisfied: pygments>=2.7.2 in ./.venv/lib/python3.9/site-packages (from pytest->-r app/requirements.txt (line 3)) (2.21.0)
+[2026-10-29T04:43:31.861Z] Requirement already satisfied: tomli>=1 in ./.venv/lib/python3.9/site-packages (from pytest->-r app/requirements.txt (line 3)) (2.5.0)
+[2026-10-29T04:43:31.861Z] Requirement already satisfied: typing-extensions>=4.6.0 in ./.venv/lib/python3.9/site-packages (from exceptiongroup>=1->pytest->-r app/requirements.txt (line 3)) (4.16.0)
+[2026-10-29T04:43:31.861Z] Requirement already satisfied: zipp>=3.20 in ./.venv/lib/python3.9/site-packages (from importlib-metadata>=3.6.0->Flask==3.1.2->-r app/requirements.txt (line 1)) (3.23.1)
+[2026-10-29T04:43:31.861Z] + python -m pip install pytest
+[2026-10-29T04:43:32.112Z] Requirement already satisfied: pytest in ./.venv/lib/python3.9/site-packages (8.4.2)
+[2026-10-29T04:43:32.112Z] Requirement already satisfied: exceptiongroup>=1 in ./.venv/lib/python3.9/site-packages (from pytest) (1.3.1)
+[2026-10-29T04:43:32.112Z] Requirement already satisfied: iniconfig>=1 in ./.venv/lib/python3.9/site-packages (from pytest) (2.1.0)
+[2026-10-29T04:43:32.112Z] Requirement already satisfied: packaging>=20 in ./.venv/lib/python3.9/site-packages (from pytest) (26.3)
+[2026-10-29T04:43:32.112Z] Requirement already satisfied: pluggy<2,>=1.5 in ./.venv/lib/python3.9/site-packages (from pytest) (1.6.0)
+[2026-10-29T04:43:32.112Z] Requirement already satisfied: pygments>=2.7.2 in ./.venv/lib/python3.9/site-packages (from pytest) (2.21.0)
+[2026-10-29T04:43:32.112Z] Requirement already satisfied: tomli>=1 in ./.venv/lib/python3.9/site-packages (from pytest) (2.5.0)
+[2026-10-29T04:43:32.112Z] Requirement already satisfied: typing-extensions>=4.6.0 in ./.venv/lib/python3.9/site-packages (from exceptiongroup>=1->pytest) (4.16.0)
+[2026-10-29T04:43:32.112Z] + echo '========== RUN AUTOMATED TESTS =========='
+[2026-10-29T04:43:32.112Z] ========== RUN AUTOMATED TESTS ==========
+[2026-10-29T04:43:32.112Z] + python -m pytest -v tests/
+[2026-10-29T04:43:32.362Z] ============================= test session starts ==============================
+[2026-10-29T04:43:32.362Z] platform linux -- Python 3.9.25, pytest-8.4.2, pluggy-1.6.0 -- /var/lib/jenkins/workspace/Testing/.venv/bin/python
+[2026-10-29T04:43:32.362Z] cachedir: .pytest_cache
+[2026-10-29T04:43:32.362Z] rootdir: /var/lib/jenkins/workspace/Testing
+[2026-10-29T04:43:32.362Z] collecting ... collected 3 items
+[2026-10-29T04:43:32.362Z] 
+[2026-10-29T04:43:32.362Z] tests/test_app.py::test_home PASSED                                      [ 33%]
+[2026-10-29T04:43:32.362Z] tests/test_app.py::test_health PASSED                                    [ 66%]
+[2026-10-29T04:43:32.362Z] tests/test_app.py::test_users PASSED                                     [100%]
+[2026-10-29T04:43:32.362Z] 
+[2026-10-29T04:43:32.362Z] ============================== 3 passed in 0.07s ===============================
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] stage
+[Pipeline] { (Build and Push to ECR)
+[Pipeline] sh
+[2026-10-29T04:43:32.684Z] + set -eu
+[2026-10-29T04:43:32.684Z] + IMAGE=351083991382.dkr.ecr.ap-south-1.amazonaws.com/devops-flask-api:59
+[2026-10-29T04:43:32.684Z] + echo '========== AWS IDENTITY =========='
+[2026-10-29T04:43:32.684Z] ========== AWS IDENTITY ==========
+[2026-10-29T04:43:32.684Z] + aws sts get-caller-identity
+[2026-10-29T04:43:32.934Z] {
+[2026-10-29T04:43:32.934Z]     "UserId": "AROAVDPR4SFLJAJ6UKCO4:i-0f866466a235a32c4",
+[2026-10-29T04:43:32.934Z]     "Account": "351083991382",
+[2026-10-29T04:43:32.934Z]     "Arn": "arn:aws:sts::351083991382:assumed-role/JenkinsEC2Role/i-0f866466a235a32c4"
+[2026-10-29T04:43:32.934Z] }
+[2026-10-29T04:43:32.934Z] + echo '========== ECR LOGIN =========='
+[2026-10-29T04:43:32.934Z] ========== ECR LOGIN ==========
+[2026-10-29T04:43:32.934Z] + aws ecr get-login-password --region ap-south-1
+[2026-10-29T04:43:32.934Z] + docker login --username AWS --password-stdin 351083991382.dkr.ecr.ap-south-1.amazonaws.com
+[2026-10-29T04:43:33.184Z] WARNING! Your password will be stored unencrypted in /var/lib/jenkins/.docker/config.json.
+[2026-10-29T04:43:33.184Z] Configure a credential helper to remove this warning. See
+[2026-10-29T04:43:33.184Z] https://docs.docker.com/engine/reference/commandline/login/#credentials-store
+[2026-10-29T04:43:33.184Z] 
+[2026-10-29T04:43:33.184Z] Login Succeeded
+[2026-10-29T04:43:33.184Z] + echo '========== BUILD IMAGE =========='
+[2026-10-29T04:43:33.184Z] ========== BUILD IMAGE ==========
+[2026-10-29T04:43:33.184Z] + docker build -t 351083991382.dkr.ecr.ap-south-1.amazonaws.com/devops-flask-api:59 .
+[2026-10-29T04:43:33.435Z] #0 building with "default" instance using docker driver
+[2026-10-29T04:43:33.435Z] 
+[2026-10-29T04:43:33.435Z] #1 [internal] load build definition from Dockerfile
+[2026-10-29T04:43:33.435Z] #1 transferring dockerfile: 497B done
+[2026-10-29T04:43:33.435Z] #1 DONE 0.0s
+[2026-10-29T04:43:33.435Z] 
+[2026-10-29T04:43:33.435Z] #2 [internal] load metadata for docker.io/library/python:3.12-slim
+[2026-10-29T04:43:33.435Z] #2 DONE 0.0s
+[2026-10-29T04:43:33.435Z] 
+[2026-10-29T04:43:33.435Z] #3 [internal] load .dockerignore
+[2026-10-29T04:43:33.435Z] #3 transferring context: 140B done
+[2026-10-29T04:43:33.435Z] #3 DONE 0.0s
+[2026-10-29T04:43:33.435Z] 
+[2026-10-29T04:43:33.435Z] #4 [1/6] FROM docker.io/library/python:3.12-slim
+[2026-10-29T04:43:33.435Z] #4 DONE 0.0s
+[2026-10-29T04:43:33.435Z] 
+[2026-10-29T04:43:33.435Z] #5 [internal] load build context
+[2026-10-29T04:43:33.435Z] #5 transferring context: 448B done
+[2026-10-29T04:43:33.435Z] #5 DONE 0.0s
+[2026-10-29T04:43:33.435Z] 
+[2026-10-29T04:43:33.435Z] #6 [2/6] WORKDIR /app
+[2026-10-29T04:43:33.435Z] #6 CACHED
+[2026-10-29T04:43:33.435Z] 
+[2026-10-29T04:43:33.435Z] #7 [4/6] RUN pip install --no-cache-dir -r requirements.txt
+[2026-10-29T04:43:33.435Z] #7 CACHED
+[2026-10-29T04:43:33.435Z] 
+[2026-10-29T04:43:33.435Z] #8 [5/6] COPY app/ .
+[2026-10-29T04:43:33.435Z] #8 CACHED
+[2026-10-29T04:43:33.435Z] 
+[2026-10-29T04:43:33.435Z] #9 [3/6] COPY app/requirements.txt .
+[2026-10-29T04:43:33.435Z] #9 CACHED
+[2026-10-29T04:43:33.435Z] 
+[2026-10-29T04:43:33.435Z] #10 [6/6] RUN useradd --create-home --uid 10001 appuser     && chown -R appuser:appuser /app
+[2026-10-29T04:43:33.435Z] #10 CACHED
+[2026-10-29T04:43:33.435Z] 
+[2026-10-29T04:43:33.435Z] #11 exporting to image
+[2026-10-29T04:43:33.435Z] #11 exporting layers done
+[2026-10-29T04:43:33.435Z] #11 writing image sha256:f8d195b66d36f5647111c5acf213f6e301c740f171db94f83c8c9030e37c716c done
+[2026-10-29T04:43:33.435Z] #11 naming to 351083991382.dkr.ecr.ap-south-1.amazonaws.com/devops-flask-api:59 done
+[2026-10-29T04:43:33.435Z] #11 DONE 0.0s
+[2026-10-29T04:43:33.435Z] + echo '========== PUSH IMAGE =========='
+[2026-10-29T04:43:33.435Z] ========== PUSH IMAGE ==========
+[2026-10-29T04:43:33.435Z] + docker push 351083991382.dkr.ecr.ap-south-1.amazonaws.com/devops-flask-api:59
+[2026-10-29T04:43:33.435Z] The push refers to repository [351083991382.dkr.ecr.ap-south-1.amazonaws.com/devops-flask-api]
+[2026-10-29T04:43:33.435Z] 883e3141e1ab: Preparing
+[2026-10-29T04:43:33.435Z] d149f8aac2db: Preparing
+[2026-10-29T04:43:33.435Z] df382e2014d7: Preparing
+[2026-10-29T04:43:33.435Z] 8d8e9b40969b: Preparing
+[2026-10-29T04:43:33.435Z] a2f763422dff: Preparing
+[2026-10-29T04:43:33.435Z] 93881a54803b: Preparing
+[2026-10-29T04:43:33.435Z] 500ecb68a701: Preparing
+[2026-10-29T04:43:33.435Z] 33d3a9468385: Preparing
+[2026-10-29T04:43:33.435Z] a70f6272827f: Preparing
+[2026-10-29T04:43:33.435Z] 93881a54803b: Waiting
+[2026-10-29T04:43:33.435Z] 500ecb68a701: Waiting
+[2026-10-29T04:43:33.435Z] 33d3a9468385: Waiting
+[2026-10-29T04:43:33.435Z] a70f6272827f: Waiting
+[2026-10-29T04:43:33.435Z] d149f8aac2db: Layer already exists
+[2026-10-29T04:43:33.435Z] df382e2014d7: Layer already exists
+[2026-10-29T04:43:33.435Z] 8d8e9b40969b: Layer already exists
+[2026-10-29T04:43:33.435Z] 883e3141e1ab: Layer already exists
+[2026-10-29T04:43:33.435Z] a2f763422dff: Layer already exists
+[2026-10-29T04:43:33.435Z] 93881a54803b: Layer already exists
+[2026-10-29T04:43:33.435Z] 500ecb68a701: Layer already exists
+[2026-10-29T04:43:33.685Z] 33d3a9468385: Layer already exists
+[2026-10-29T04:43:33.685Z] a70f6272827f: Layer already exists
+[2026-10-29T04:43:33.685Z] 59: digest: sha256:3e0ab7023510cbd26ed782e1a1cc3061f85512cb66aeb868e2fdac3e55c87f3c size: 2199
+[2026-10-29T04:43:33.685Z] + echo 'Published image: 351083991382.dkr.ecr.ap-south-1.amazonaws.com/devops-flask-api:59'
+[2026-10-29T04:43:33.685Z] Published image: 351083991382.dkr.ecr.ap-south-1.amazonaws.com/devops-flask-api:59
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] stage
+[Pipeline] { (Deploy to Docker Server)
+[Pipeline] sshagent
+[2026-10-29T04:43:33.757Z] [ssh-agent] Using credentials Ayushgautam2007
+[2026-10-29T04:43:33.757Z] $ ssh-agent
+[2026-10-29T04:43:33.762Z] SSH_AUTH_SOCK=/tmp/ssh-XXXXXXA4jDbI/agent.418715
+[2026-10-29T04:43:33.762Z] SSH_AGENT_PID=418719
+[2026-10-29T04:43:33.762Z] Running ssh-add (command line suppressed)
+[2026-10-29T04:43:33.766Z] [ssh-agent] Started.
+[Pipeline] {
+[Pipeline] sh
+[2026-10-29T04:43:34.038Z] + set -eu
+[2026-10-29T04:43:34.038Z] + IMAGE=351083991382.dkr.ecr.ap-south-1.amazonaws.com/devops-flask-api:59
+[2026-10-29T04:43:34.038Z] + echo '========== DEPLOYMENT TARGET =========='
+[2026-10-29T04:43:34.038Z] ========== DEPLOYMENT TARGET ==========
+[2026-10-29T04:43:34.038Z] + echo ec2-user@172.31.13.199
+[2026-10-29T04:43:34.038Z] ec2-user@172.31.13.199
+[2026-10-29T04:43:34.038Z] + echo 'Image: 351083991382.dkr.ecr.ap-south-1.amazonaws.com/devops-flask-api:59'
+[2026-10-29T04:43:34.038Z] Image: 351083991382.dkr.ecr.ap-south-1.amazonaws.com/devops-flask-api:59
+[2026-10-29T04:43:34.038Z] + ssh -o BatchMode=yes ec2-user@172.31.13.199 'bash -s -- '\''351083991382.dkr.ecr.ap-south-1.amazonaws.com/devops-flask-api:59'\'' '\''59'\'' '\''ap-south-1'\'' '\''351083991382.dkr.ecr.ap-south-1.amazonaws.com'\'''
+[2026-10-29T04:43:34.288Z] ========== CHECK RECOVERY CONTAINERS ==========
+[2026-10-29T04:43:34.288Z] ========== ECR LOGIN ON APP SERVER ==========
+[2026-10-29T04:43:34.839Z] WARNING! Your password will be stored unencrypted in /home/ec2-user/.docker/config.json.
+[2026-10-29T04:43:34.839Z] Configure a credential helper to remove this warning. See
+[2026-10-29T04:43:34.839Z] https://docs.docker.com/engine/reference/commandline/login/#credentials-store
+[2026-10-29T04:43:34.839Z] 
+[2026-10-29T04:43:34.839Z] Login Succeeded
+[2026-10-29T04:43:34.839Z] ========== PULL IMAGE ==========
+[2026-10-29T04:43:34.839Z] 59: Pulling from devops-flask-api
+[2026-10-29T04:43:34.839Z] Digest: sha256:3e0ab7023510cbd26ed782e1a1cc3061f85512cb66aeb868e2fdac3e55c87f3c
+[2026-10-29T04:43:34.839Z] Status: Downloaded newer image for 351083991382.dkr.ecr.ap-south-1.amazonaws.com/devops-flask-api:59
+[2026-10-29T04:43:34.839Z] 351083991382.dkr.ecr.ap-south-1.amazonaws.com/devops-flask-api:59
+[2026-10-29T04:43:34.839Z] ========== START CANDIDATE ==========
+[2026-10-29T04:43:35.089Z] 11fadf1be5de9c116c5fac7aa5b171188ba0b620439f9ec9db6bef0ce18a72ca
+[2026-10-29T04:43:39.212Z] ========== CANDIDATE HEALTH CHECK ==========
+[2026-10-29T04:43:39.212Z] {"status":"healthy"}
+[2026-10-29T04:43:39.212Z] 
+[2026-10-29T04:43:39.212Z] Candidate health check passed.
+[2026-10-29T04:43:39.762Z] flask-api-candidate-59
+[2026-10-29T04:43:39.762Z] ========== IDENTIFY PRODUCTION CONTAINER ==========
+[2026-10-29T04:43:39.762Z] Current production container: flask-api
+[2026-10-29T04:43:39.762Z] ========== PRESERVE CURRENT PRODUCTION ==========
+[2026-10-29T04:43:40.313Z] flask-api
+[2026-10-29T04:43:40.313Z] Previous production container preserved as: flask-api-rollback-59
+[2026-10-29T04:43:40.313Z] ========== START NEW PRODUCTION ==========
+[2026-10-29T04:43:40.313Z] ff0e530e0788f27cd7ff01abd4a66389efb10447d405e0db29b1df19b54faea6
+[2026-10-29T04:43:44.435Z] ========== PRODUCTION HEALTH CHECK ==========
+[2026-10-29T04:43:44.435Z] {"status":"healthy"}
+[2026-10-29T04:43:44.435Z] 
+[2026-10-29T04:43:44.435Z] Production health check passed.
+[2026-10-29T04:43:44.435Z] Deployed image: 351083991382.dkr.ecr.ap-south-1.amazonaws.com/devops-flask-api:59
+[2026-10-29T04:43:44.435Z] Previous container preserved as: flask-api-rollback-59
+[2026-10-29T04:43:44.435Z] ========== RUNNING CONTAINERS ==========
+[2026-10-29T04:43:44.435Z] NAMES       IMAGE                                                               STATUS         PORTS
+[2026-10-29T04:43:44.435Z] flask-api   351083991382.dkr.ecr.ap-south-1.amazonaws.com/devops-flask-api:59   Up 4 seconds   127.0.0.1:9090->8080/tcp
+[Pipeline] }
+[2026-10-29T04:43:44.445Z] $ ssh-agent -k
+[2026-10-29T04:43:44.450Z] unset SSH_AUTH_SOCK;
+[2026-10-29T04:43:44.450Z] unset SSH_AGENT_PID;
+[2026-10-29T04:43:44.450Z] echo Agent pid 418719 killed;
+[2026-10-29T04:43:44.450Z] [ssh-agent] Stopped.
+[Pipeline] // sshagent
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] stage
+[Pipeline] { (Ansible Post-Deployment Validation)
+[Pipeline] sh
+[2026-10-29T04:43:44.787Z] + set -eu
+[2026-10-29T04:43:44.787Z] + echo '========== ANSIBLE VERSION =========='
+[2026-10-29T04:43:44.787Z] ========== ANSIBLE VERSION ==========
+[2026-10-29T04:43:44.787Z] + ansible --version
+[2026-10-29T04:43:44.787Z] ansible [core 2.15.3]
+[2026-10-29T04:43:44.787Z]   config file = /var/lib/jenkins/workspace/Testing/ansible/ansible.cfg
+[2026-10-29T04:43:44.787Z]   configured module search path = ['/var/lib/jenkins/.ansible/plugins/modules', '/usr/share/ansible/plugins/modules']
+[2026-10-29T04:43:44.787Z]   ansible python module location = /usr/lib/python3.9/site-packages/ansible
+[2026-10-29T04:43:44.787Z]   ansible collection location = /var/lib/jenkins/.ansible/collections:/usr/share/ansible/collections
+[2026-10-29T04:43:44.787Z]   executable location = /usr/bin/ansible
+[2026-10-29T04:43:44.787Z]   python version = 3.9.25 (main, Jul 15 2026, 00:00:00) [GCC 11.5.0 20240719 (Red Hat 11.5.0-5)] (/usr/bin/python3.9)
+[2026-10-29T04:43:44.787Z]   jinja version = 3.1.4
+[2026-10-29T04:43:44.787Z]   libyaml = True
+[2026-10-29T04:43:44.787Z] + echo '========== INVENTORY VALIDATION =========='
+[2026-10-29T04:43:44.787Z] ========== INVENTORY VALIDATION ==========
+[2026-10-29T04:43:44.787Z] + ansible-inventory -i ansible/inventory/hosts.ini --list
+[2026-10-29T04:43:45.037Z] {
+[2026-10-29T04:43:45.037Z]     "_meta": {
+[2026-10-29T04:43:45.037Z]         "hostvars": {
+[2026-10-29T04:43:45.037Z]             "app-server": {
+[2026-10-29T04:43:45.037Z]                 "ansible_host": "172.31.13.199",
+[2026-10-29T04:43:45.037Z]                 "ansible_ssh_private_key_file": "/var/lib/jenkins/.ssh/docker_server_key",
+[2026-10-29T04:43:45.037Z]                 "ansible_user": "ec2-user"
+[2026-10-29T04:43:45.037Z]             }
+[2026-10-29T04:43:45.037Z]         }
+[2026-10-29T04:43:45.037Z]     },
+[2026-10-29T04:43:45.037Z]     "all": {
+[2026-10-29T04:43:45.037Z]         "children": [
+[2026-10-29T04:43:45.037Z]             "ungrouped",
+[2026-10-29T04:43:45.037Z]             "docker_servers"
+[2026-10-29T04:43:45.037Z]         ]
+[2026-10-29T04:43:45.037Z]     },
+[2026-10-29T04:43:45.037Z]     "docker_servers": {
+[2026-10-29T04:43:45.037Z]         "hosts": [
+[2026-10-29T04:43:45.037Z]             "app-server"
+[2026-10-29T04:43:45.037Z]         ]
+[2026-10-29T04:43:45.037Z]     }
+[2026-10-29T04:43:45.037Z] }
+[2026-10-29T04:43:45.037Z] + echo '========== DOCKER HEALTH VALIDATION =========='
+[2026-10-29T04:43:45.037Z] ========== DOCKER HEALTH VALIDATION ==========
+[2026-10-29T04:43:45.037Z] + ansible-playbook -i ansible/inventory/hosts.ini ansible/playbooks/docker_health.yml
+[2026-10-29T04:43:45.588Z] 
+[2026-10-29T04:43:45.588Z] PLAY [Check Docker application server health] **********************************
+[2026-10-29T04:43:45.588Z] 
+[2026-10-29T04:43:45.588Z] TASK [Check Docker service state] **********************************************
+[2026-10-29T04:43:48.071Z] ok: [app-server]
+[2026-10-29T04:43:48.071Z] 
+[2026-10-29T04:43:48.071Z] TASK [Display Docker service state] ********************************************
+[2026-10-29T04:43:48.071Z] ok: [app-server] => {
+[2026-10-29T04:43:48.071Z]     "msg": "Docker service: active"
+[2026-10-29T04:43:48.071Z] }
+[2026-10-29T04:43:48.071Z] 
+[2026-10-29T04:43:48.071Z] TASK [Check running containers] ************************************************
+[2026-10-29T04:43:49.414Z] ok: [app-server]
+[2026-10-29T04:43:49.414Z] 
+[2026-10-29T04:43:49.414Z] TASK [Display running containers] **********************************************
+[2026-10-29T04:43:49.414Z] ok: [app-server] => {
+[2026-10-29T04:43:49.414Z]     "running_containers.stdout_lines": [
+[2026-10-29T04:43:49.414Z]         "flask-api 351083991382.dkr.ecr.ap-south-1.amazonaws.com/devops-flask-api:59 Up 8 seconds"
+[2026-10-29T04:43:49.414Z]     ]
+[2026-10-29T04:43:49.414Z] }
+[2026-10-29T04:43:49.414Z] 
+[2026-10-29T04:43:49.414Z] TASK [Check Flask application health endpoint] *********************************
+[2026-10-29T04:43:51.275Z] ok: [app-server]
+[2026-10-29T04:43:51.275Z] 
+[2026-10-29T04:43:51.275Z] TASK [Display application health] **********************************************
+[2026-10-29T04:43:51.275Z] ok: [app-server] => {
+[2026-10-29T04:43:51.275Z]     "msg": "Application health response: {\"status\":\"healthy\"}\n"
+[2026-10-29T04:43:51.275Z] }
+[2026-10-29T04:43:51.275Z] 
+[2026-10-29T04:43:51.275Z] PLAY RECAP *********************************************************************
+[2026-10-29T04:43:51.275Z] app-server                 : ok=6    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
+[2026-10-29T04:43:51.275Z] 
+[2026-10-29T04:43:51.275Z] + echo '========== DISK USAGE VALIDATION =========='
+[2026-10-29T04:43:51.275Z] ========== DISK USAGE VALIDATION ==========
+[2026-10-29T04:43:51.275Z] + ansible-playbook -i ansible/inventory/hosts.ini ansible/playbooks/disk_check.yml
+[2026-10-29T04:43:51.526Z] 
+[2026-10-29T04:43:51.526Z] PLAY [Check application server disk usage] *************************************
+[2026-10-29T04:43:51.526Z] 
+[2026-10-29T04:43:51.526Z] TASK [Read root filesystem usage] **********************************************
+[2026-10-29T04:43:54.008Z] ok: [app-server]
+[2026-10-29T04:43:54.008Z] 
+[2026-10-29T04:43:54.008Z] TASK [Extract root filesystem usage percentage] ********************************
+[2026-10-29T04:43:54.008Z] ok: [app-server]
+[2026-10-29T04:43:54.008Z] 
+[2026-10-29T04:43:54.008Z] TASK [Display root filesystem usage] *******************************************
+[2026-10-29T04:43:54.008Z] ok: [app-server] => {
+[2026-10-29T04:43:54.008Z]     "msg": "Root filesystem usage: 16% (alert threshold: 80%)"
+[2026-10-29T04:43:54.008Z] }
+[2026-10-29T04:43:54.008Z] 
+[2026-10-29T04:43:54.008Z] TASK [Fail if root filesystem usage reaches 80 percent] ************************
+[2026-10-29T04:43:54.008Z] skipping: [app-server]
+[2026-10-29T04:43:54.008Z] 
+[2026-10-29T04:43:54.008Z] TASK [Confirm disk usage is below threshold] ***********************************
+[2026-10-29T04:43:54.008Z] ok: [app-server] => {
+[2026-10-29T04:43:54.008Z]     "msg": "PASS: Root filesystem usage is below 80%."
+[2026-10-29T04:43:54.008Z] }
+[2026-10-29T04:43:54.008Z] 
+[2026-10-29T04:43:54.008Z] PLAY RECAP *********************************************************************
+[2026-10-29T04:43:54.008Z] app-server                 : ok=4    changed=0    unreachable=0    failed=0    skipped=1    rescued=0    ignored=0   
+[2026-10-29T04:43:54.008Z] 
+[2026-10-29T04:43:54.008Z] + echo 'ANSIBLE POST-DEPLOYMENT VALIDATION PASSED'
+[2026-10-29T04:43:54.008Z] ANSIBLE POST-DEPLOYMENT VALIDATION PASSED
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] stage
+[Pipeline] { (Declarative: Post Actions)
+[Pipeline] echo
+[2026-10-29T04:43:54.084Z] Build number: 59
+[Pipeline] echo
+[2026-10-29T04:43:54.097Z] ECR image: 351083991382.dkr.ecr.ap-south-1.amazonaws.com/devops-flask-api:59
+[Pipeline] echo
+[2026-10-29T04:43:54.114Z] PIPELINE SUCCESS: Tests, ECR push, Docker deployment and Ansible validation completed.
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] }
+[Pipeline] // timestamps
+[Pipeline] }
+[Pipeline] // withEnv
+[Pipeline] }
+[Pipeline] // withEnv
+[Pipeline] }
+[Pipeline] // node
+[Pipeline] End of Pipeline
+Finished: SUCCESS
