@@ -9,24 +9,25 @@
 
 ## Table of Contents
 
-1. [Project Overview](#project-overview)
-2. [Key Features](#key-features)
-3. [Architecture](#architecture)
-4. [Technology Stack](#technology-stack)
-5. [Application API](#application-api)
-6. [Jenkins CI/CD Pipeline](#jenkins-cicd-pipeline)
-7. [Docker and Amazon ECR](#docker-and-amazon-ecr)
-8. [Ansible Validation](#ansible-validation)
-9. [Terraform Infrastructure](#terraform-infrastructure)
-10. [Amazon EKS and Kubernetes](#amazon-eks-and-kubernetes)
-11. [Monitoring and Alerting](#monitoring-and-alerting)
-12. [Rollback and Recovery](#rollback-and-recovery)
-13. [Challenges and Solutions](#challenges-and-solutions)
-14. [Validation Results](#validation-results)
-15. [Security and Cost Considerations](#security-and-cost-considerations)
-16. [Repository Structure](#repository-structure)
-17. [Documentation and Screenshots](#documentation-and-screenshots)
-18. [Future Improvements](#future-improvements)
+1. [Project Overview](#1-project-overview)
+2. [Key Features](#2-key-features)
+3. [Architecture](#3-architecture)
+4. [Technology Stack](#4-technology-stack)
+5. [Application API](#5-application-api)
+6. [Jenkins CI/CD Pipeline](#6-jenkins-cicd-pipeline)
+7. [Docker and Amazon ECR](#7-docker-and-amazon-ecr)
+8. [Ansible Validation](#8-ansible-validation)
+9. [Terraform Infrastructure](#9-terraform-infrastructure)
+10. [Amazon EKS and Kubernetes](#10-amazon-eks-and-kubernetes)
+11. [Monitoring and Alerting](#11-monitoring-and-alerting)
+12. [Rollback and Recovery](#12-rollback-and-recovery)
+13. [Challenges and Solutions](#13-challenges-and-solutions)
+14. [Validation Results](#14-validation-results)
+15. [Security and Cost Considerations](#15-security-and-cost-considerations)
+16. [Repository Structure](#16-repository-structure)
+17. [Documentation and Screenshots](#17-documentation-and-screenshots)
+18. [Future Improvements](#18-future-improvements)
+19. [Conclusion](#conclusion)
 
 ---
 
@@ -59,75 +60,133 @@ The project demonstrates how application delivery, infrastructure provisioning, 
 ## 3. Architecture
 
 ```text
-                 Developer
-                     |
-                     v
-              GitHub Repository
-                     |
-               Push / Webhook
-                     |
-                     v
-                Jenkins CI/CD
-                     |
-          +----------+-----------+
-          |          |           |
-          v          v           v
-       Checkout    pytest    Docker Build
-                                 |
-                                 v
-                            Amazon ECR
-                                 |
-                                 v
-                       Docker Application Host
-                                 |
-                      Health Check + Ansible
-                                 |
-                                 v
-                       Deployment Validation
+                         Developer
+                             |
+                             v
+                      GitHub Repository
+                             |
+                        Push / Webhook
+                             |
+                             v
+                        Jenkins CI/CD
+                             |
+                 +-----------+-----------+
+                 |           |           |
+                 v           v           v
+              Checkout     pytest    Docker Build
+                                         |
+                                         v
+                                     Amazon ECR
+                                         |
+                                         v
+                              Docker Application Host
+                                         |
+                               Health Check + Ansible
+                                         |
+                                         v
+                              Deployment Validation
 
 
-          Separate Infrastructure / Kubernetes Path
+         Separate Infrastructure / Kubernetes Path
 
-                         Terraform
-                             |
-                             v
-                    AWS VPC and Networking
-                             |
-                             v
-                         Amazon EKS
-                             |
-                             v
-                    Kubernetes Deployment
-                             |
-                             v
-                     Application Pods
-                             |
-                             v
-                    Kubernetes Service
-                             |
-                             v
-                       ALB Ingress
-                             |
-                             v
-                         Flask API
+                              Terraform
+                                  |
+                                  v
+                         AWS VPC and Networking
+                                  |
+                                  v
+                              Amazon EKS
+                                  |
+                                  v
+                         Kubernetes Deployment
+                                  |
+                                  v
+                           Application Pods
+                                  |
+                                  v
+                          Kubernetes Service
+                                  |
+                                  v
+                             ALB Ingress
+                                  |
+                                  v
+                              Flask API
 
 
-                       Monitoring Stack
+                            Monitoring Stack
 
-                    Node Exporter
-                         |
-                         v
-                     Prometheus
-                      /       \
-                     v         v
-                Alert Rules   Grafana
-                     |
-                     v
-                 Alertmanager
-                     |
-                     v
-             Configured Notifications
+                           Node Exporter
+                                  |
+                                  v
+                              Prometheus
+                               /       \
+                              v         v
+                         Alert Rules  Grafana
+                              |
+                              v
+                          Alertmanager
+                              |
+                              v
+                      Configured Notifications
 ```
+
+### 3.1 Overall End-to-End DevOps Architecture
+
+This diagram illustrates the overall workflow from source code to deployment, including CI/CD, AWS infrastructure, containerization, Kubernetes, and monitoring.
+
+![Overall End-to-End DevOps Architecture](docs/capstone-documentation/Architecture/01-overall-devops-architecture.png)
+
+### 3.2 AWS Resources Architecture
+
+This diagram illustrates the AWS networking and resource layout, including VPC, subnets, EKS, ECR, load balancing, IAM, and supporting AWS services.
+
+![AWS Resources Architecture](docs/capstone-documentation/AWS-Resources/02-aws-resources-architecture.png)
+
+### 3.3 Docker, ECR and Ansible Architecture
+
+This diagram illustrates Docker image creation, Amazon ECR image storage, vulnerability scanning, and Ansible-based deployment validation.
+
+![Docker, ECR and Ansible Architecture](docs/capstone-documentation/Docker-ECR-Ansible/03-docker-ecr-ansible-architecture.png)
+
+### 3.4 Jenkins CI/CD Architecture
+
+This diagram illustrates the Jenkins pipeline stages, including GitHub checkout, automated testing, Docker build, image scanning, ECR publishing, deployment, and notifications.
+
+![Jenkins CI/CD Architecture](docs/capstone-documentation/Jenkins-CICD/04-jenkins-cicd-architecture.png)
+
+### 3.5 EKS, Kubernetes and ALB Architecture
+
+This diagram illustrates application access through a load balancer, Kubernetes workloads on EKS, worker nodes, application Pods, and container images from ECR.
+
+![EKS Kubernetes ALB Architecture](docs/capstone-documentation/EKS-Kubernetes-ALB/05-eks-kubernetes-alb-architecture.png)
+
+### 3.6 Terraform Infrastructure Architecture
+
+This diagram illustrates infrastructure provisioning through Terraform, including AWS networking, EKS, ECR, IAM, resource outputs, and CI/CD integration.
+
+![Terraform Infrastructure Architecture](docs/capstone-documentation/Terraform/06-terraform-infrastructure-architecture.png)
+
+### 3.7 Monitoring and Alerts Architecture
+
+This diagram illustrates application and infrastructure monitoring using Prometheus, Grafana, Alertmanager, CloudWatch, and notification integrations.
+
+![Monitoring and Alerts Architecture](docs/capstone-documentation/Monitoring-Alerts/07-monitoring-alerts-architecture.png)
+
+### 3.8 Rollback and Recovery Architecture
+
+This diagram illustrates application rollback, preservation of previous versions, database recovery strategies, infrastructure recreation, and disaster recovery concepts.
+
+![Rollback and Recovery Architecture](docs/capstone-documentation/Rollback-Recovery/08-rollback-recovery-architecture.png)
+
+### 3.9 Final Capstone Architecture and Deployment Flow
+
+This diagram presents the overall capstone solution, combining source control, CI/CD, AWS infrastructure, EKS deployment, monitoring, security, and recovery strategies.
+
+![Final Capstone Architecture and Deployment Flow](docs/capstone-documentation/Architecture/09-final-capstone-architecture.png)
+
+> **Architecture note:** These diagrams provide visual documentation of the project design. Optional services and capabilities must be marked as implemented only when their configuration and test evidence are available.
+
+---
 
 ## 4. Technology Stack
 
@@ -167,7 +226,7 @@ The Flask application exposes the following endpoints:
 
 ### Sample Users Response
 
-The application’s documented sample data includes Ayush and DevOps. The exact JSON response should be verified against the current application implementation.
+The application's documented sample data includes Ayush and DevOps. The exact JSON response should be verified against the current application implementation.
 
 The Dockerfile uses `python:3.12-slim`, runs Gunicorn on container port `8080`, and uses a non-root application user named `appuser` with UID `10001`.
 
@@ -197,11 +256,15 @@ Build #54 was recorded as successful on October 27, 2026.
 
 Recorded source commit:
 
-`3ff0c70e00fe417f6ad7eeca57540c51946c7ef2`
+```text
+3ff0c70e00fe417f6ad7eeca57540c51946c7ef2
+```
 
 Commit message:
 
-`fix(k8s): align deployment image tag with live version`
+```text
+fix(k8s): align deployment image tag with live version
+```
 
 Webhook delivery, Jenkins trigger configuration, and an individual build's cause are separate checks. The recorded evidence included GitHub push-trigger evidence for `Webhook-Test` and GitHub push-cause metadata for `Testing` Build #54.
 
@@ -299,7 +362,7 @@ The application Deployment, Service, and Ingress are named `devops-flask-api`.
 - EKS cluster `devops-capstone-eks` reported `ACTIVE`.
 - Node group `devops-capstone-nodes` reported `ACTIVE`.
 - Two worker nodes were `Ready`.
-- Two application pods were running and ready.
+- Two application Pods were running and ready.
 - The Deployment reported two desired and two available replicas.
 - The ALB Ingress exposed the application over HTTP.
 
@@ -475,7 +538,7 @@ The following results were recorded during the documented inspection period.
 | EKS Cluster | `ACTIVE` |
 | EKS Node Group | `ACTIVE` |
 | Kubernetes Nodes | Two nodes `Ready` |
-| Application Pods | Two pods running and ready |
+| Application Pods | Two Pods running and ready |
 | ALB Endpoints | `/health` and `/api/users` returned HTTP 200 |
 | Prometheus | Configured targets reported `UP` |
 | Prometheus Alerts | No active alerts at the recorded inspection time |
@@ -507,6 +570,23 @@ Devops-Project/
 ├── app/
 ├── docs/
 │   └── capstone-documentation/
+│       ├── Architecture/
+│       │   ├── 01-overall-devops-architecture.png
+│       │   └── 09-final-capstone-architecture.png
+│       ├── AWS-Resources/
+│       │   └── 02-aws-resources-architecture.png
+│       ├── Docker-ECR-Ansible/
+│       │   └── 03-docker-ecr-ansible-architecture.png
+│       ├── Jenkins-CICD/
+│       │   └── 04-jenkins-cicd-architecture.png
+│       ├── EKS-Kubernetes-ALB/
+│       │   └── 05-eks-kubernetes-alb-architecture.png
+│       ├── Terraform/
+│       │   └── 06-terraform-infrastructure-architecture.png
+│       ├── Monitoring-Alerts/
+│       │   └── 07-monitoring-alerts-architecture.png
+│       └── Rollback-Recovery/
+│           └── 08-rollback-recovery-architecture.png
 ├── k8s/
 ├── terraform/
 ├── tests/
@@ -522,7 +602,7 @@ The Terraform working directory on the Jenkins server is maintained separately a
 
 ## 17. Documentation and Screenshots
 
-Supporting screenshots are organized into the following categories:
+Supporting screenshots and architecture diagrams are organized into the following categories:
 
 - `Architecture/`
 - `Jenkins-CICD/`
@@ -533,7 +613,7 @@ Supporting screenshots are organized into the following categories:
 - `Rollback-Recovery/`
 - `AWS-Resources/`
 
-Add links to these folders or individual images only after confirming their actual paths in the repository. Each caption should explain what the screenshot demonstrates and include the build number or inspection date where relevant.
+Each screenshot should demonstrate a real configuration, test, build, deployment, or validation result. Add links to individual screenshots only after confirming their actual paths in the repository.
 
 Before publishing screenshots, redact credentials, tokens, private keys, SMTP app passwords, and any infrastructure details that do not need to be public.
 
