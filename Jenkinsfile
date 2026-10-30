@@ -327,7 +327,6 @@ REMOTE_SCRIPT
 
         // ==========================================
         // STAGE 6: EKS DEPLOYMENT
-        // NEW CI/CD STAGE
         // ==========================================
 
         stage('Deploy to Amazon EKS') {
@@ -342,6 +341,7 @@ REMOTE_SCRIPT
                     echo "Cluster: $EKS_CLUSTER_NAME"
                     echo "Namespace: $K8S_NAMESPACE"
                     echo "Deployment: $K8S_DEPLOYMENT"
+                    echo "Container: $K8S_CONTAINER"
                     echo "Image: $IMAGE"
 
                     echo "========== AWS IDENTITY =========="
@@ -358,26 +358,97 @@ REMOTE_SCRIPT
 
                     kubectl get nodes
 
-                    echo "========== VERIFY NAMESPACE =========="
-
-                    kubectl get namespace "$K8S_NAMESPACE" \
-                        --ignore-not-found
-
-                    echo "========== CREATE DYNAMIC MANIFEST =========="
+                    echo "========== RENDER KUBERNETES MANIFEST =========="
 
                     RENDERED_MANIFEST="$(mktemp)"
-                    export RENDERED_MANIFEST
+                    export RENDERED_MANIFEST IMAGE K8S_CONTAINER
 
                     trap 'rm -f "$RENDERED_MANIFEST"' EXIT
 
-                    sed -E \
-                        "s|^([[:space:]]*image:).*|\\1 $IMAGE|" \
-                        k8s/deployment.yaml \
-                        > "$RENDERED_MANIFEST"
+                    python3 - <<'PY'
+import os
+import re
+import sys
 
-                    echo "Rendered deployment image: $IMAGE"
+source = "k8s/deployment.yaml"
+destination = os.environ["RENDERED_MANIFEST"]
+image = os.environ["IMAGE"]
+container_name = os.environ["K8S_CONTAINER"]
 
-                    echo "========== APPLY DEPLOYMENT =========="
+with open(source, "r", encoding="utf-8") as file:
+    lines = file.readlines()
+
+inside_target = False
+container_indent = None
+image_replaced = False
+match_count = 0
+
+for index, line in enumerate(lines):
+
+    container_match = re.match(
+        r"^(\\s*)-\\s+name:\\s*([^\\s]+)\\s*$",
+        line
+    )
+
+    if container_match:
+        indent = len(container_match.group(1))
+        name = container_match.group(2)
+
+        if inside_target and indent <= container_indent:
+            inside_target = False
+
+        if name == container_name:
+            if inside_target:
+                print("ERROR: Duplicate container definition.")
+                sys.exit(1)
+
+            inside_target = True
+            container_indent = indent
+            image_replaced = False
+            match_count += 1
+
+        continue
+
+    if inside_target and not image_replaced:
+
+        image_match = re.match(
+            r"^(\\s*)image:\\s*.*$",
+            line
+        )
+
+        if image_match:
+            indent = len(image_match.group(1))
+
+            if indent > container_indent:
+                lines[index] = (
+                    image_match.group(1)
+                    + "image: "
+                    + image
+                    + "\\n"
+                )
+                image_replaced = True
+
+if match_count != 1 or not image_replaced:
+    print(
+        "ERROR: Could not uniquely locate image field for container:",
+        container_name
+    )
+    sys.exit(1)
+
+with open(destination, "w", encoding="utf-8") as file:
+    file.writelines(lines)
+
+print("Container:", container_name)
+print("Updated image:", image)
+PY
+
+                    echo "========== VERIFY RENDERED MANIFEST =========="
+
+                    grep -A 5 -B 2 \
+                        "name: $K8S_CONTAINER" \
+                        "$RENDERED_MANIFEST"
+
+                    echo "========== APPLY NAMESPACE AND DEPLOYMENT =========="
 
                     kubectl apply -f "$RENDERED_MANIFEST"
 
